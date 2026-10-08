@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Cetak Kartu Garansi | Polar Profilms</title>
+    <link rel="stylesheet" href="warranty.css?v=20261008-1">
+  </head>
+  <body class="warranty-page card-page" data-print-side="both">
+    <header class="warranty-header">
+      <a href="index.html" aria-label="Polar Profilms home"><img src="assets/polar-logo-dark.png" alt="Polar Profilms" width="145" height="49"></a>
+      <nav aria-label="Navigasi kartu"><a href="index.html">Website Polar</a><a href="warranty.html">Check Warranty</a><span class="workspace-label">Penerbitan kartu</span></nav>
+    </header>
+    <main class="card-main">
+      <div class="card-heading"><div><p class="warranty-eyebrow">Polar aftercare</p><h1>Kartu Garansi</h1></div><span class="draft-badge" data-draft-state>Draf belum diterbitkan</span></div>
+      <div class="card-workspace">
+        <section class="card-editor" aria-label="Data kartu garansi">
+          <form id="card-form" data-card-form>
+            <fieldset>
+              <legend>Pemasangan</legend>
+              <label for="card-code">Nomor garansi</label>
+              <div class="code-row"><input id="card-code" name="code" maxlength="18" pattern="PLR-[0-9]{4}-[A-Z0-9]{8}" spellcheck="false" autocomplete="off" required><button class="icon-button" type="button" data-new-code title="Nomor garansi baru" aria-label="Nomor garansi baru"><i data-lucide="refresh-cw" aria-hidden="true"></i></button></div>
+              <label for="card-dealer">Dealer pemasang</label><input id="card-dealer" name="dealer" maxlength="80" placeholder="Nama dealer Polar" required>
+              <div class="form-columns"><div><label for="card-date">Tanggal pemasangan</label><input id="card-date" name="installedAt" type="date" required></div><div><label for="card-years">Masa garansi</label><select id="card-years" name="years"><option value="5">5 tahun</option><option value="6">6 tahun</option><option value="7">7 tahun</option><option value="8">8 tahun</option><option value="9">9 tahun</option><option value="10">10 tahun</option></select></div></div>
+              <p class="expiry-note">Berlaku sampai <strong data-expiry-label>-</strong></p>
+            </fieldset>
+            <fieldset>
+              <legend>Kendaraan</legend>
+              <label for="card-vehicle">Merek / tipe</label><input id="card-vehicle" name="vehicle" maxlength="80" placeholder="Range Rover Velar" required>
+              <label for="card-vin">Nomor rangka / VIN</label><input id="card-vin" name="vin" minlength="17" maxlength="17" pattern="[A-HJ-NPR-Za-hj-npr-z0-9]{17}" placeholder="17 karakter nomor rangka" autocomplete="off" spellcheck="false" aria-describedby="vin-hint" required><p class="field-hint" id="vin-hint">Nomor rangka dicetak lengkap; hasil cek online hanya menampilkan 6 karakter terakhir.</p>
+              <div class="form-columns"><div><label for="card-year">Tahun</label><input id="card-year" name="year" type="number" min="1950" max="2100" placeholder="2026" required></div><div><label for="card-color">Warna</label><input id="card-color" name="color" maxlength="30" placeholder="White" required></div></div>
+            </fieldset>
+            <fieldset>
+              <legend>Kaca film</legend>
+              <div class="film-fields" data-film-fields></div>
+            </fieldset>
+            <fieldset>
+              <legend>Kartu &amp; QR</legend>
+              <label for="card-base-url">Alamat website Polar</label><input id="card-base-url" name="baseUrl" type="url" maxlength="240" placeholder="https://polarfilms.co/" aria-describedby="url-hint" required><p class="field-hint" id="url-hint">Alamat website yang sudah online, untuk tujuan QR pada kartu.</p>
+              <label for="card-notes">Catatan garansi</label><textarea id="card-notes" name="notes" rows="4" maxlength="450">Simpan kartu garansi dan bukti pemasangan. Ikuti petunjuk perawatan dari dealer Polar. Ketentuan dan cakupan garansi mengacu pada dokumen garansi serta invoice pemasangan Anda.</textarea>
+            </fieldset>
+            <button class="w-button w-primary save-button" type="submit"><i data-lucide="save" aria-hidden="true"></i> Simpan Draf</button>
+          </form>
+          <p class="editor-message" data-editor-message role="status" aria-live="polite"></p>
+          <section class="saved-drafts" aria-labelledby="saved-title"><h2 id="saved-title">Draf tersimpan</h2><select data-saved-drafts aria-label="Pilih draf tersimpan"><option value="">Belum ada draf</option></select><div class="draft-actions"><button class="w-button w-secondary" type="button" data-export-drafts disabled><i data-lucide="download" aria-hidden="true"></i> Backup Draf</button><label class="w-button w-secondary import-label"><i data-lucide="upload" aria-hidden="true"></i> Impor Draf<input type="file" data-import-drafts accept="application/json,.json" class="sr-only"></label></div><button class="w-button w-secondary export-button" type="button" data-export-registry disabled><i data-lucide="file-down" aria-hidden="true"></i> Ekspor Daftar Garansi</button><p class="field-hint">Draf tersimpan di perangkat ini. Garansi dapat dicek online setelah daftar diekspor dan diterbitkan di website oleh Polar.</p></section>
+        </section>
+        <section class="card-preview-area" aria-labelledby="preview-title">
+          <div class="preview-toolbar"><h2 id="preview-title">Pratinjau kartu</h2><div class="print-actions"><select aria-label="Sisi yang dicetak" data-print-select><option value="both">Depan &amp; belakang</option><option value="front">Depan saja</option><option value="back">Belakang saja</option></select><button class="w-button w-secondary" type="button" data-print-card disabled><i data-lucide="printer" aria-hidden="true"></i> Cetak</button><button class="w-button w-primary" type="button" data-download-pdf disabled><i data-lucide="download" aria-hidden="true"></i> Unduh PDF</button></div></div>
+          <p class="preview-caption">190 x 80 mm <span data-preview-status>Data kartu belum lengkap</span></p>
+          <div class="print-document">
+            <div class="print-sheet sheet-front"><p class="side-label">Sisi depan</p>
+              <article class="warranty-card warranty-card-front" aria-label="Kartu garansi sisi depan">
+                <div class="card-brand-row"><span>WARRANTY CARD</span><img src="assets/polar-logo-dark.png" alt="Polar Profilms"></div>
+                <div class="card-front-content"><div class="card-welcome"><h2>Selamat!</h2><p>Terima kasih telah memilih Polar Profilms untuk kenyamanan, privasi, dan perlindungan kendaraan Anda.</p><h3>Garansi &amp; perawatan</h3><p class="card-notes" data-card-text="notes"></p><div class="card-contact"><strong>Polar Customer Service</strong><span>+62 817 9377 001</span></div></div><div class="card-qr-block"><div class="card-qr" data-card-qr><span>Alamat website<br>belum diisi</span></div><strong>Cek garansi Anda</strong><span class="card-code" data-card-text="code">-</span><a class="card-check-url" data-card-url href="warranty.html">polar warranty</a></div></div>
+                <div class="card-front-footer"><span>Designed in Sweden</span><span data-card-text="yearsLabel">5 tahun</span></div>
+              </article>
+            </div>
+            <div class="print-sheet sheet-back"><p class="side-label">Sisi belakang</p>
+              <article class="warranty-card warranty-card-back" aria-label="Kartu garansi sisi belakang"><div class="card-back-brand"><img src="assets/polar-logo-dark.png" alt="Polar Profilms"><span>DATA PEMASANGAN</span></div><dl class="card-vehicle-details"><div><dt>Nomor garansi</dt><dd data-card-text="code">-</dd></div><div><dt>Merek / tipe</dt><dd data-card-text="vehicle">-</dd></div><div><dt>No. rangka</dt><dd class="card-vin" data-card-text="vin">-</dd></div><div><dt>Tahun / warna</dt><dd data-card-text="yearColor">-</dd></div><div><dt>Dealer</dt><dd data-card-text="dealer">-</dd></div><div><dt>Tanggal pasang</dt><dd data-card-text="installedLabel">-</dd></div></dl><div class="card-film-details"><h3>Tipe kaca film</h3><dl><div><dt>Kaca depan</dt><dd data-card-text="frontLabel">-</dd></div><div><dt>Kaca samping</dt><dd data-card-text="sideLabel">-</dd></div><div><dt>Kaca belakang</dt><dd data-card-text="rearLabel">-</dd></div></dl></div><div class="card-validity"><span>Berlaku sampai</span><strong data-card-text="expiryLabel">-</strong></div></article>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+    <script src="vendor/lucide.min.js"></script>
+    <script src="vendor/qrcode.js"></script>
+    <script src="vendor/pdf-lib.min.js"></script>
+    <script src="assets/warranty-logo-data.js"></script>
+    <script src="assets/warranty-registry.js?v=20261007-1"></script>
+    <script src="warranty-core.js?v=20261007-1"></script>
+    <script src="warranty-pdf.js?v=20261008-1"></script>
+    <script src="warranty-card.js?v=20261008-2"></script>
+  </body>
+</html>

@@ -8,7 +8,8 @@
       name="description"
       content="Polar Profilms is a premium window film brand for automotive, residential, and commercial glass applications."
     >
-    <link rel="stylesheet" href="styles.css?v=20260618-github-intro-centered">
+    <link rel="stylesheet" href="styles.css?v=20261008-1">
+    <link rel="stylesheet" href="warranty.css?v=20261008-1">
     <style>
       .intro-section .section-copy {
         display: block;
@@ -54,7 +55,7 @@
         <a href="#stockholm">Stockholm</a>
         <a href="#compare">Compare</a>
         <a href="#dealer">Dealer</a>
-        <a href="#warranty">Warranty</a>
+        <a href="warranty.html">Check Warranty</a>
       </nav>
 
       <div class="header-actions">
@@ -437,6 +438,20 @@
           <h2 id="warranty-title">Designed to stay clear, backed for 5 Years+.</h2>
         </div>
 
+        <div class="warranty-check-block">
+          <div class="panel-title"><i data-lucide="shield-check" aria-hidden="true"></i><h3>Check Warranty</h3></div>
+          <form class="warranty-check-form" data-warranty-check>
+            <label for="warranty-code">Nomor garansi</label>
+            <div class="warranty-search-row">
+              <input id="warranty-code" name="code" placeholder="PLR-2026-XXXXXXXX" maxlength="18" autocomplete="off" autocapitalize="characters" spellcheck="false" required aria-describedby="warranty-message">
+              <button class="w-button w-primary" type="submit"><i data-lucide="search" aria-hidden="true"></i> Cek Garansi</button>
+            </div>
+          </form>
+          <p class="warranty-message" id="warranty-message" data-warranty-message role="status" aria-live="polite"></p>
+          <section class="warranty-result" data-warranty-result hidden tabindex="-1" aria-label="Hasil pengecekan garansi"></section>
+          <div class="warranty-check-links"><a href="warranty.html">Halaman cek garansi <i data-lucide="arrow-up-right" aria-hidden="true"></i></a><a href="warranty-card.html">Cetak kartu garansi <i data-lucide="printer" aria-hidden="true"></i></a></div>
+        </div>
+
         <div class="faq-list">
           <details open>
             <summary>How long before I can clean the glass?</summary>
@@ -448,7 +463,7 @@
           </details>
           <details>
             <summary>How do I register warranty?</summary>
-            <p>Use the product code and dealer invoice after installation. Registered work receives 5 Years+ documented coverage.</p>
+            <p>Your Polar dealer records your vehicle and film details after installation. Once Polar publishes the registration, use the warranty number or scan your card's QR code to check its status online.</p>
           </details>
         </div>
       </section>
@@ -507,13 +522,17 @@
       <nav aria-label="Footer navigation">
         <a href="#films">Films</a>
         <a href="#dealer">Dealer</a>
-        <a href="#warranty">Warranty</a>
+        <a href="warranty.html">Check Warranty</a>
         <a href="#quote">Contact</a>
       </nav>
     </footer>
 
-    <script src="glb-viewer.js?v=20260618-complete-gzip-glb"></script>
-    <script src="assets/velar-glb-data.js?v=20260618-complete-gzip-glb"></script>
+    <script src="glb-viewer.js?v=20261008-1"></script>
+    <script src="assets/velar-glb-data.js?v=20261008-1"></script>
     <script src="script.js?v=20260617-inside-shade-tune"></script>
+    <script src="vendor/lucide.min.js"></script>
+    <script src="assets/warranty-registry.js?v=20261007-1"></script>
+    <script src="warranty-core.js?v=20261007-1"></script>
+    <script src="warranty-check.js?v=20261007-1"></script>
   </body>
 </html>

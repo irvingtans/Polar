@@ -365,10 +365,28 @@ select {
   background: var(--fog);
 }
 
+.intro-section .section-copy {
+  display: block;
+  max-width: 1080px;
+  margin-bottom: clamp(30px, 4vw, 46px);
+  text-align: center;
+}
+
+.intro-section .section-copy > .eyebrow {
+  margin-top: 0;
+}
+
+.intro-section h2 {
+  max-width: 1080px;
+  margin-right: auto;
+  margin-left: auto;
+  font-size: clamp(2.8rem, 5.8vw, 5.45rem);
+}
+
 .intro-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14px;
+  gap: 16px;
   max-width: 1320px;
   margin: 0 auto;
 }
@@ -382,14 +400,16 @@ select {
 }
 
 .intro-grid article {
-  min-height: 245px;
-  padding: 26px;
+  min-height: 218px;
+  padding: 28px;
+  text-align: center;
 }
 
 .mini-icon {
   display: inline-grid;
   width: 42px;
   height: 42px;
+  margin: 0 auto;
   place-items: center;
   border-radius: 50%;
   color: var(--white);
@@ -1551,6 +1571,10 @@ details p {
   .shade-tool,
   .quote-form {
     padding: 20px;
+  }
+
+  .intro-grid article {
+    min-height: 0;
   }
 
   .headquarters-facts div {

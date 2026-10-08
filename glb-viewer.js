@@ -281,7 +281,12 @@
     }
 
     async loadArrayBuffer(src) {
-      if (window.location.protocol === "file:" && window.POLAR_VELAR_GLB_BASE64_CHUNKS) {
+      const hasEmbeddedModel = Boolean(
+        window.POLAR_VELAR_GLB_GZIP_BASE64_CHUNKS?.length ||
+          window.POLAR_VELAR_GLB_BASE64_CHUNKS?.length
+      );
+
+      if (window.location.protocol === "file:" && hasEmbeddedModel) {
         return this.loadEmbeddedArrayBuffer();
       }
 
@@ -293,7 +298,7 @@
         try {
           return await this.loadArrayBufferWithXhr(src, error);
         } catch (xhrError) {
-          if (window.POLAR_VELAR_GLB_BASE64_CHUNKS) return this.loadEmbeddedArrayBuffer();
+          if (hasEmbeddedModel) return this.loadEmbeddedArrayBuffer();
           throw xhrError;
         }
       }
@@ -316,10 +321,18 @@
       });
     }
 
-    loadEmbeddedArrayBuffer() {
+    async loadEmbeddedArrayBuffer() {
+      if (window.POLAR_VELAR_GLB_GZIP_BASE64_CHUNKS?.length) {
+        return this.loadEmbeddedGzipArrayBuffer(window.POLAR_VELAR_GLB_GZIP_BASE64_CHUNKS);
+      }
+
       const chunks = window.POLAR_VELAR_GLB_BASE64_CHUNKS;
       if (!chunks?.length) throw new Error("Embedded GLB is missing");
 
+      return this.decodeBase64Chunks(chunks).buffer;
+    }
+
+    decodeBase64Chunks(chunks) {
       const byteLength = chunks.reduce((total, chunk) => {
         const padding = chunk.endsWith("==") ? 2 : chunk.endsWith("=") ? 1 : 0;
         return total + Math.floor((chunk.length * 3) / 4) - padding;
@@ -335,7 +348,19 @@
         }
       });
 
-      return bytes.buffer;
+      return bytes;
+    }
+
+    async loadEmbeddedGzipArrayBuffer(chunks) {
+      if (!("DecompressionStream" in window)) {
+        throw new Error("Compressed embedded GLB is not supported by this browser");
+      }
+
+      const compressedBytes = this.decodeBase64Chunks(chunks);
+      const compressedStream = new Blob([compressedBytes], { type: "application/gzip" })
+        .stream()
+        .pipeThrough(new DecompressionStream("gzip"));
+      return await new Response(compressedStream).arrayBuffer();
     }
 
     setVlt(vlt) {

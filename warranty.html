@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Cek status dan masa berlaku garansi kaca film Polar Profilms.">
+    <title>Check Warranty | Polar Profilms</title>
+    <link rel="stylesheet" href="warranty.css?v=20261008-1">
+  </head>
+  <body class="warranty-page">
+    <header class="warranty-header">
+      <a href="index.html" aria-label="Polar Profilms home"><img src="assets/polar-logo-dark.png" alt="Polar Profilms" width="145" height="49"></a>
+      <nav aria-label="Navigasi garansi">
+        <a href="index.html">Website Polar</a>
+        <a href="warranty.html" aria-current="page">Check Warranty</a>
+        <a class="header-contact" href="https://wa.me/628179377001" target="_blank" rel="noopener">Polar CS <i data-lucide="arrow-up-right" aria-hidden="true"></i></a>
+      </nav>
+    </header>
+    <main class="warranty-main">
+      <div class="warranty-heading">
+        <p class="warranty-eyebrow">Polar aftercare</p>
+        <h1>Check Warranty</h1>
+        <p>Cek status dan masa berlaku garansi kaca film Anda.</p>
+      </div>
+      <div class="check-layout">
+        <section class="check-panel" aria-labelledby="check-title">
+          <div class="panel-title"><i data-lucide="shield-check" aria-hidden="true"></i><h2 id="check-title">Cek garansi Anda</h2></div>
+          <form class="warranty-check-form" data-warranty-check>
+            <label for="warranty-code">Nomor garansi</label>
+            <div class="warranty-search-row">
+              <input id="warranty-code" name="code" placeholder="PLR-2026-XXXXXXXX" maxlength="18" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-describedby="code-hint warranty-message" required>
+              <button class="w-button w-primary" type="submit"><i data-lucide="search" aria-hidden="true"></i> Cek Garansi</button>
+            </div>
+            <p class="field-hint" id="code-hint">Nomor tercantum pada kartu garansi Polar Anda.</p>
+          </form>
+          <p class="warranty-message" id="warranty-message" data-warranty-message role="status" aria-live="polite"></p>
+          <section class="warranty-result" data-warranty-result hidden tabindex="-1" aria-label="Hasil pengecekan garansi"></section>
+          <noscript><p>Aktifkan JavaScript untuk memeriksa daftar garansi.</p></noscript>
+        </section>
+        <aside class="check-support">
+          <img class="support-logo" src="assets/polar-logo-dark.png" alt="Polar Profilms" width="160" height="54">
+          <h2>Perlindungan yang<br>tetap bersama Anda.</h2>
+          <p>Simpan kartu dan bukti pemasangan untuk pengajuan layanan garansi.</p>
+          <div class="support-contact"><span>Butuh bantuan?</span><a href="https://wa.me/628179377001" target="_blank" rel="noopener">Polar CS +62 817 9377 001 <i data-lucide="arrow-up-right" aria-hidden="true"></i></a></div>
+        </aside>
+      </div>
+    </main>
+    <footer class="warranty-footer"><span>Polar Profilms</span><a href="index.html#warranty">Perawatan &amp; garansi</a></footer>
+    <script src="vendor/lucide.min.js"></script>
+    <script src="assets/warranty-registry.js?v=20261007-1"></script>
+    <script src="warranty-core.js?v=20261007-1"></script>
+    <script src="warranty-check.js?v=20261007-1"></script>
+  </body>
+</html>
