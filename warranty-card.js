@@ -1,5 +1,6 @@
 (function () {
   "use strict";
+  if (!window.PolarAdmin?.allowed()) return;
   const core = window.PolarWarranty;
   const form = document.querySelector("[data-card-form]");
   if (!form || !core) return;
@@ -178,6 +179,7 @@
   }
 
   function validate() {
+    if (!window.PolarAdmin.requireAccess("expired")) return null;
     form.elements.code.value = core.normalizeCode(form.elements.code.value);
     form.elements.vin.value = form.elements.vin.value.trim().toUpperCase();
     const baseUrl = core.cleanBaseUrl(form.elements.baseUrl.value);

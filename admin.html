@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Admin | Polar Profilms</title>
+    <link rel="stylesheet" href="warranty.css?v=20261008-admin1">
+    <script src="admin-access.js?v=20261008-admin1"></script>
+  </head>
+  <body class="warranty-page admin-page">
+    <header class="warranty-header">
+      <a href="index.html" aria-label="Polar Profilms home"><img src="assets/polar-logo-dark.png" alt="Polar Profilms" width="145" height="49"></a>
+      <nav aria-label="Navigasi admin"><a href="index.html">Website Polar</a><a href="warranty.html">Check Warranty</a><span class="workspace-label">Admin</span></nav>
+    </header>
+    <main class="admin-main">
+      <section class="admin-panel" aria-labelledby="admin-title">
+        <div class="admin-symbol"><i data-lucide="key-round" aria-hidden="true"></i></div>
+        <p class="warranty-eyebrow">Polar aftercare</p>
+        <h1 id="admin-title">Admin</h1>
+        <p class="admin-subtitle">Penerbitan kartu garansi</p>
+        <form data-admin-login>
+          <label for="admin-pin">PIN Admin</label>
+          <div class="admin-pin-row">
+            <input id="admin-pin" name="pin" type="password" inputmode="numeric" pattern="[0-9]{4}" minlength="4" maxlength="4" autocomplete="off" required aria-describedby="admin-message">
+            <button class="icon-button" type="button" data-pin-toggle aria-label="Tampilkan PIN" title="Tampilkan PIN" aria-pressed="false"><i data-lucide="eye" aria-hidden="true"></i></button>
+          </div>
+          <p class="admin-message" id="admin-message" data-admin-message role="status" aria-live="polite"></p>
+          <button class="w-button w-primary admin-submit" type="submit">Masuk <i data-lucide="arrow-right" aria-hidden="true"></i></button>
+        </form>
+        <noscript><p class="admin-message">Aktifkan JavaScript untuk membuka area Admin.</p></noscript>
+      </section>
+    </main>
+    <footer class="warranty-footer"><span>Polar Profilms</span><a href="warranty.html">Check Warranty</a></footer>
+    <script src="vendor/lucide.min.js"></script>
+    <script src="admin.js?v=20261008-admin1"></script>
+  </body>
+</html>

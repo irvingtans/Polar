@@ -1,16 +1,18 @@
 <!doctype html>
-<html lang="id">
+<html lang="id" data-admin-protected>
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="noindex, nofollow">
-    <title>Cetak Kartu Garansi | Polar Profilms</title>
-    <link rel="stylesheet" href="warranty.css?v=20261008-1">
+    <title>Admin - Kartu Garansi | Polar Profilms</title>
+    <link rel="stylesheet" href="warranty.css?v=20261008-admin1">
+    <script src="admin-access.js?v=20261008-admin1"></script>
   </head>
   <body class="warranty-page card-page" data-print-side="both">
+    <div data-admin-workspace hidden>
     <header class="warranty-header">
       <a href="index.html" aria-label="Polar Profilms home"><img src="assets/polar-logo-dark.png" alt="Polar Profilms" width="145" height="49"></a>
-      <nav aria-label="Navigasi kartu"><a href="index.html">Website Polar</a><a href="warranty.html">Check Warranty</a><span class="workspace-label">Penerbitan kartu</span></nav>
+      <nav aria-label="Navigasi kartu"><a href="index.html">Website Polar</a><a href="warranty.html">Check Warranty</a><span class="workspace-label">Admin</span><button class="w-button w-secondary" type="button" data-admin-logout><i data-lucide="log-out" aria-hidden="true"></i> Keluar</button></nav>
     </header>
     <main class="card-main">
       <div class="card-heading"><div><p class="warranty-eyebrow">Polar aftercare</p><h1>Kartu Garansi</h1></div><span class="draft-badge" data-draft-state>Draf belum diterbitkan</span></div>
@@ -63,6 +65,8 @@
         </section>
       </div>
     </main>
+    </div>
+    <noscript><main class="admin-main"><p>Aktifkan JavaScript untuk membuka area Admin. <a href="admin.html">Kembali ke Admin</a></p></main></noscript>
     <script src="vendor/lucide.min.js"></script>
     <script src="vendor/qrcode.js"></script>
     <script src="vendor/pdf-lib.min.js"></script>
@@ -70,6 +74,6 @@
     <script src="assets/warranty-registry.js?v=20261007-1"></script>
     <script src="warranty-core.js?v=20261007-1"></script>
     <script src="warranty-pdf.js?v=20261008-1"></script>
-    <script src="warranty-card.js?v=20261008-2"></script>
+    <script src="warranty-card.js?v=20261008-admin1"></script>
   </body>
 </html>
