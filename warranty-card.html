@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="noindex, nofollow">
     <title>Admin - Kartu Garansi | Polar Profilms</title>
-    <link rel="stylesheet" href="warranty.css?v=20261008-admin1">
+    <link rel="stylesheet" href="warranty.css?v=20261009-ppf1">
     <script src="admin-access.js?v=20261008-admin1"></script>
   </head>
   <body class="warranty-page card-page" data-print-side="both">
@@ -21,6 +21,7 @@
           <form id="card-form" data-card-form>
             <fieldset>
               <legend>Pemasangan</legend>
+              <label for="card-product">Jenis produk</label><select id="card-product" name="productType"><option value="window-film">Kaca film</option><option value="ppf">PPF</option></select>
               <label for="card-code">Nomor garansi</label>
               <div class="code-row"><input id="card-code" name="code" maxlength="18" pattern="PLR-[0-9]{4}-[A-Z0-9]{8}" spellcheck="false" autocomplete="off" required><button class="icon-button" type="button" data-new-code title="Nomor garansi baru" aria-label="Nomor garansi baru"><i data-lucide="refresh-cw" aria-hidden="true"></i></button></div>
               <label for="card-dealer">Dealer pemasang</label><input id="card-dealer" name="dealer" maxlength="80" placeholder="Nama dealer Polar" required>
@@ -33,9 +34,14 @@
               <label for="card-vin">Nomor rangka / VIN</label><input id="card-vin" name="vin" minlength="17" maxlength="17" pattern="[A-HJ-NPR-Za-hj-npr-z0-9]{17}" placeholder="17 karakter nomor rangka" autocomplete="off" spellcheck="false" aria-describedby="vin-hint" required><p class="field-hint" id="vin-hint">Nomor rangka dicetak lengkap; hasil cek online hanya menampilkan 6 karakter terakhir.</p>
               <div class="form-columns"><div><label for="card-year">Tahun</label><input id="card-year" name="year" type="number" min="1950" max="2100" placeholder="2026" required></div><div><label for="card-color">Warna</label><input id="card-color" name="color" maxlength="30" placeholder="White" required></div></div>
             </fieldset>
-            <fieldset>
+            <fieldset data-window-film-fields>
               <legend>Kaca film</legend>
               <div class="film-fields" data-film-fields></div>
+            </fieldset>
+            <fieldset data-ppf-fields hidden disabled>
+              <legend>Paint Protection Film</legend>
+              <label for="card-ppf-series">Seri PPF</label><select id="card-ppf-series" name="ppfSeries" required></select>
+              <label for="card-ppf-coverage">Area pemasangan</label><input id="card-ppf-coverage" name="ppfCoverage" maxlength="80" placeholder="Full body" required>
             </fieldset>
             <fieldset>
               <legend>Kartu &amp; QR</legend>
@@ -53,13 +59,13 @@
           <div class="print-document">
             <div class="print-sheet sheet-front"><p class="side-label">Sisi depan</p>
               <article class="warranty-card warranty-card-front" aria-label="Kartu garansi sisi depan">
-                <div class="card-brand-row"><span>WARRANTY CARD</span><img src="assets/polar-logo-dark.png" alt="Polar Profilms"></div>
-                <div class="card-front-content"><div class="card-welcome"><h2>Selamat!</h2><p>Terima kasih telah memilih Polar Profilms untuk kenyamanan, privasi, dan perlindungan kendaraan Anda.</p><h3>Garansi &amp; perawatan</h3><p class="card-notes" data-card-text="notes"></p><div class="card-contact"><strong>Polar Customer Service</strong><span>+62 817 9377 001</span></div></div><div class="card-qr-block"><div class="card-qr" data-card-qr><span>Alamat website<br>belum diisi</span></div><strong>Cek garansi Anda</strong><span class="card-code" data-card-text="code">-</span><a class="card-check-url" data-card-url href="warranty.html">polar warranty</a></div></div>
+                <div class="card-brand-row"><span data-card-text="cardLabel">WARRANTY CARD</span><img src="assets/polar-logo-dark.png" alt="Polar Profilms"></div>
+                <div class="card-front-content"><div class="card-welcome"><h2>Selamat!</h2><p data-card-text="welcome">Terima kasih telah memilih Polar Profilms untuk kenyamanan, privasi, dan perlindungan kendaraan Anda.</p><h3>Garansi &amp; perawatan</h3><p class="card-notes" data-card-text="notes"></p><div class="card-contact"><strong>Polar Customer Service</strong><span>+62 817 9377 001</span></div></div><div class="card-qr-block"><div class="card-qr" data-card-qr><span>Alamat website<br>belum diisi</span></div><strong>Cek garansi Anda</strong><span class="card-code" data-card-text="code">-</span><a class="card-check-url" data-card-url href="warranty.html">polar warranty</a></div></div>
                 <div class="card-front-footer"><span>Designed in Sweden</span><span data-card-text="yearsLabel">5 tahun</span></div>
               </article>
             </div>
             <div class="print-sheet sheet-back"><p class="side-label">Sisi belakang</p>
-              <article class="warranty-card warranty-card-back" aria-label="Kartu garansi sisi belakang"><div class="card-back-brand"><img src="assets/polar-logo-dark.png" alt="Polar Profilms"><span>DATA PEMASANGAN</span></div><dl class="card-vehicle-details"><div><dt>Nomor garansi</dt><dd data-card-text="code">-</dd></div><div><dt>Merek / tipe</dt><dd data-card-text="vehicle">-</dd></div><div><dt>No. rangka</dt><dd class="card-vin" data-card-text="vin">-</dd></div><div><dt>Tahun / warna</dt><dd data-card-text="yearColor">-</dd></div><div><dt>Dealer</dt><dd data-card-text="dealer">-</dd></div><div><dt>Tanggal pasang</dt><dd data-card-text="installedLabel">-</dd></div></dl><div class="card-film-details"><h3>Tipe kaca film</h3><dl><div><dt>Kaca depan</dt><dd data-card-text="frontLabel">-</dd></div><div><dt>Kaca samping</dt><dd data-card-text="sideLabel">-</dd></div><div><dt>Kaca belakang</dt><dd data-card-text="rearLabel">-</dd></div></dl></div><div class="card-validity"><span>Berlaku sampai</span><strong data-card-text="expiryLabel">-</strong></div></article>
+              <article class="warranty-card warranty-card-back" aria-label="Kartu garansi sisi belakang"><div class="card-back-brand"><img src="assets/polar-logo-dark.png" alt="Polar Profilms"><span>DATA PEMASANGAN</span></div><dl class="card-vehicle-details"><div><dt>Nomor garansi</dt><dd data-card-text="code">-</dd></div><div><dt>Merek / tipe</dt><dd data-card-text="vehicle">-</dd></div><div><dt>No. rangka</dt><dd class="card-vin" data-card-text="vin">-</dd></div><div><dt>Tahun / warna</dt><dd data-card-text="yearColor">-</dd></div><div><dt>Dealer</dt><dd data-card-text="dealer">-</dd></div><div><dt>Tanggal pasang</dt><dd data-card-text="installedLabel">-</dd></div></dl><div class="card-film-details"><h3 data-product-heading>Tipe kaca film</h3><dl data-product-details></dl></div><div class="card-validity"><span>Berlaku sampai</span><strong data-card-text="expiryLabel">-</strong></div></article>
             </div>
           </div>
         </section>
@@ -72,8 +78,8 @@
     <script src="vendor/pdf-lib.min.js"></script>
     <script src="assets/warranty-logo-data.js"></script>
     <script src="assets/warranty-registry.js?v=20261007-1"></script>
-    <script src="warranty-core.js?v=20261007-1"></script>
-    <script src="warranty-pdf.js?v=20261008-1"></script>
-    <script src="warranty-card.js?v=20261008-admin1"></script>
+    <script src="warranty-core.js?v=20261009-ppf1"></script>
+    <script src="warranty-pdf.js?v=20261009-ppf1"></script>
+    <script src="warranty-card.js?v=20261009-ppf1"></script>
   </body>
 </html>

@@ -59,9 +59,8 @@
       ["Tanggal pemasangan", core.formatDate(record.installedAt)],
       ["Berlaku sampai", core.formatDate(record.expiresAt)],
       ["Masa garansi", `${record.years} tahun`],
-      ["Kaca depan", `Polar ${record.films.front.series} / ${record.films.front.tint}% Tint`],
-      ["Kaca samping", `Polar ${record.films.side.series} / ${record.films.side.tint}% Tint`],
-      ["Kaca belakang", `Polar ${record.films.rear.series} / ${record.films.rear.tint}% Tint`],
+      ["Jenis produk", core.productType(record) === "ppf" ? "Paint Protection Film" : "Kaca film"],
+      ...core.productDetails(record),
     ].forEach(([label, value]) => list.append(field(label, value)));
     result.append(badge, title, number, list);
     result.hidden = false;

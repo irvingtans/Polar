@@ -21,6 +21,7 @@
   let registryAvailable = true;
   let publishedRecords = [];
   let storageAvailable = true;
+  let windowFilmYears = "5";
 
   try { publishedRecords = core.registryRecords(window.PolarWarrantyRegistry); }
   catch (_) { registryAvailable = false; message.textContent = "Daftar garansi belum dimuat. Ekspor daftar belum tersedia."; }
@@ -52,6 +53,19 @@
     row.append(seriesGroup, tintGroup);
     filmFields.append(row);
   });
+  core.ppfSeries.forEach(series => form.elements.ppfSeries.add(new Option(`PPF POLAR ${series}`, series)));
+
+  function syncProductFields() {
+    const ppf = form.elements.productType.value === "ppf";
+    const ppfFields = document.querySelector("[data-ppf-fields]");
+    const windowFields = document.querySelector("[data-window-film-fields]");
+    ppfFields.hidden = !ppf;
+    ppfFields.disabled = !ppf;
+    windowFields.hidden = ppf;
+    windowFields.disabled = ppf;
+    form.elements.years.disabled = ppf;
+    if (ppf) form.elements.years.value = "5";
+  }
 
   form.elements.code.value = uniqueCode();
   form.elements.installedAt.value = core.today();
@@ -86,23 +100,34 @@
       code: core.normalizeCode(value("code")), dealer: value("dealer"),
       vehicle: value("vehicle"), vin: value("vin").toUpperCase(),
       year: Number(value("year")), color: value("color"), installedAt: value("installedAt"),
-      years: Number(value("years")), notes: value("notes"), films: {},
+      years: Number(value("years")), notes: value("notes"), productType: value("productType"),
     };
     record.expiresAt = core.expiryDate(record.installedAt, record.years);
-    core.positions.forEach(position => {
-      record.films[position] = { series: value(`${position}Series`), tint: Number(value(`${position}Tint`)) };
-    });
+    if (record.productType === "ppf") record.ppf = { series: value("ppfSeries"), coverage: value("ppfCoverage") };
+    else {
+      record.films = {};
+      core.positions.forEach(position => {
+        record.films[position] = { series: value(`${position}Series`), tint: Number(value(`${position}Tint`)) };
+      });
+    }
     return record;
   }
 
   function fillForm(record) {
+    form.elements.productType.value = core.productType(record);
     ["code", "dealer", "vehicle", "vin", "year", "color", "installedAt", "years", "notes"].forEach(key => {
       form.elements[key].value = record[key];
     });
-    core.positions.forEach(position => {
-      form.elements[`${position}Series`].value = record.films[position].series;
-      form.elements[`${position}Tint`].value = String(record.films[position].tint);
-    });
+    if (core.productType(record) === "ppf") {
+      form.elements.ppfSeries.value = record.ppf.series;
+      form.elements.ppfCoverage.value = record.ppf.coverage;
+    } else {
+      windowFilmYears = String(record.years);
+      core.positions.forEach(position => {
+        form.elements[`${position}Series`].value = record.films[position].series;
+        form.elements[`${position}Tint`].value = String(record.films[position].tint);
+      });
+    }
     render();
   }
 
@@ -132,6 +157,7 @@
   }
 
   function render() {
+    syncProductFields();
     const record = readForm();
     const url = core.verificationUrl(form.elements.baseUrl.value, record.code);
     renderQr(url);
@@ -139,8 +165,21 @@
       ...record, yearColor: `${record.year || "-"} / ${record.color || "-"}`,
       installedLabel: core.formatDate(record.installedAt), expiryLabel: core.formatDate(record.expiresAt),
       yearsLabel: `${record.years} tahun`,
+      cardLabel: record.productType === "ppf" ? "PPF WARRANTY CARD" : "WARRANTY CARD",
+      welcome: record.productType === "ppf" ? "Terima kasih telah memilih Polar Profilms untuk perlindungan kendaraan Anda." : "Terima kasih telah memilih Polar Profilms untuk kenyamanan, privasi, dan perlindungan kendaraan Anda.",
     };
-    core.positions.forEach(position => { text[`${position}Label`] = `Polar ${record.films[position].series} / ${record.films[position].tint}% Tint`; });
+    document.querySelector("[data-product-heading]").textContent = record.productType === "ppf" ? "Paint Protection Film" : "Tipe kaca film";
+    const details = document.querySelector("[data-product-details]");
+    details.replaceChildren();
+    core.productDetails(record).forEach(([label, value]) => {
+      const row = document.createElement("div");
+      const term = document.createElement("dt");
+      const description = document.createElement("dd");
+      term.textContent = label;
+      description.textContent = value;
+      row.append(term, description);
+      details.append(row);
+    });
     document.querySelectorAll("[data-card-text]").forEach(element => { element.textContent = text[element.dataset.cardText] || "-"; });
     document.querySelector("[data-expiry-label]").textContent = text.expiryLabel;
     const cardLink = document.querySelector("[data-card-url]");
@@ -215,11 +254,21 @@
     window.setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
 
-  form.addEventListener("input", () => {
+  form.addEventListener("input", event => {
+    if (event.target.name === "productType") return;
     form.elements.baseUrl.setCustomValidity("");
     render();
   });
-  form.addEventListener("change", render);
+  form.addEventListener("change", event => {
+    if (event.target.name === "productType") {
+      if (event.target.value === "ppf") {
+        windowFilmYears = form.elements.years.value;
+        form.elements.years.value = "5";
+      } else form.elements.years.value = windowFilmYears;
+      savedSelect.value = "";
+    }
+    render();
+  });
   form.addEventListener("submit", event => {
     event.preventDefault();
     const record = validate();

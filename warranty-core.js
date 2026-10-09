@@ -2,6 +2,7 @@
   "use strict";
 
   const series = ["Signature", "Drive", "Clear IR"];
+  const ppfSeries = ["GLOSS\u00c9", "BLANC"];
   const shades = [10, 20, 40, 70, 80];
   const positions = ["front", "side", "rear"];
   const codePattern = /^PLR-\d{4}-[A-Z0-9]{8}$/;
@@ -77,6 +78,26 @@
     });
   }
 
+  function productType(record) {
+    return record.productType === undefined ? "window-film" : record.productType;
+  }
+
+  function validProduct(record) {
+    const type = productType(record);
+    if (type === "window-film") return validFilms(record.films);
+    return type === "ppf" && record.years === 5 && record.ppf &&
+      ppfSeries.includes(record.ppf.series) && validText(record.ppf.coverage);
+  }
+
+  function productDetails(record) {
+    if (productType(record) === "ppf") return [
+      ["Seri PPF", `PPF POLAR ${record.ppf?.series || "-"}`],
+      ["Area pemasangan", record.ppf?.coverage || "-"],
+    ];
+    const labels = { front: "Kaca depan", side: "Kaca samping", rear: "Kaca belakang" };
+    return positions.map(position => [labels[position], `Polar ${record.films[position].series} / ${record.films[position].tint}% Tint`]);
+  }
+
   function isPublicRecord(record) {
     return Boolean(record && codePattern.test(record.code) && validText(record.vehicle)
       && /^[A-HJ-NPR-Z0-9]{6}$/.test(record.vinSuffix || "")
@@ -84,7 +105,7 @@
       && validText(record.color, 30) && validText(record.dealer)
       && dateValue(record.installedAt) && record.installedAt <= today()
       && record.expiresAt === expiryDate(record.installedAt, record.years)
-      && ["registered", "cancelled"].includes(record.state) && validFilms(record.films));
+      && ["registered", "cancelled"].includes(record.state) && validProduct(record));
   }
 
   function isDraft(record) {
@@ -99,7 +120,9 @@
       code: draft.code, vehicle: draft.vehicle, vinSuffix: draft.vin.slice(-6),
       year: draft.year, color: draft.color, dealer: draft.dealer,
       installedAt: draft.installedAt, expiresAt: draft.expiresAt, years: draft.years,
-      films: draft.films, state: "registered",
+      productType: productType(draft),
+      ...(productType(draft) === "ppf" ? { ppf: { series: draft.ppf.series, coverage: draft.ppf.coverage } } : { films: draft.films }),
+      state: "registered",
     };
   }
 
@@ -118,8 +141,10 @@
   }
 
   function sameRecord(previous, record) {
-    return ["vehicle", "vinSuffix", "year", "color", "dealer", "installedAt", "expiresAt", "years"].every(key => previous[key] === record[key])
-      && positions.every(position => previous.films[position].series === record.films[position].series && previous.films[position].tint === record.films[position].tint);
+    if (productType(previous) !== productType(record) ||
+        !["vehicle", "vinSuffix", "year", "color", "dealer", "installedAt", "expiresAt", "years"].every(key => previous[key] === record[key])) return false;
+    if (productType(record) === "ppf") return previous.ppf.series === record.ppf.series && previous.ppf.coverage === record.ppf.coverage;
+    return positions.every(position => previous.films[position].series === record.films[position].series && previous.films[position].tint === record.films[position].tint);
   }
 
   function exportRegistry(registry, drafts) {
@@ -134,5 +159,5 @@
     return `window.PolarWarrantyRegistry = ${JSON.stringify({ version: 1, records }, null, 2)};\n`;
   }
 
-  root.PolarWarranty = { series, shades, positions, codePattern, normalizeCode, today, expiryDate, formatDate, createCode, cleanBaseUrl, verificationUrl, isDraft, publicRecord, sameRecord, registryRecords, lookup, exportRegistry };
+  root.PolarWarranty = { series, ppfSeries, shades, positions, productType, productDetails, codePattern, normalizeCode, today, expiryDate, formatDate, createCode, cleanBaseUrl, verificationUrl, isDraft, publicRecord, sameRecord, registryRecords, lookup, exportRegistry };
 })(typeof window !== "undefined" ? window : globalThis);

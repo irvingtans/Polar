@@ -86,11 +86,12 @@
   }
 
   function drawFront(context, record, url, logo, core, qrFactory, sample) {
-    textBox(context, sample ? "CONTOH - BUKAN GARANSI AKTIF" : "WARRANTY CARD", 8, 10, 115, { size: 2.2, bold: true });
+    const ppf = core.productType(record) === "ppf";
+    textBox(context, sample ? "CONTOH - BUKAN GARANSI AKTIF" : ppf ? "PPF WARRANTY CARD" : "WARRANTY CARD", 8, 10, 115, { size: 2.2, bold: true });
     drawLogo(context, logo, 153, 6, 29);
     rule(context, 18, blue, 0.45);
     textBox(context, "Selamat!", 8, 22, 122, { size: 7.5, bold: true });
-    textBox(context, "Terima kasih telah memilih Polar Profilms untuk kenyamanan, privasi, dan perlindungan kendaraan Anda.", 8, 33, 122, { size: 2.5, maxLines: 2 });
+    textBox(context, ppf ? "Terima kasih telah memilih Polar Profilms untuk perlindungan kendaraan Anda." : "Terima kasih telah memilih Polar Profilms untuk kenyamanan, privasi, dan perlindungan kendaraan Anda.", 8, 33, 122, { size: 2.5, maxLines: 2 });
     textBox(context, "Garansi & perawatan", 8, 42, 122, { size: 2.7, bold: true });
     textBox(context, record.notes, 8, 47, 122, { size: 2.4, minSize: 2, maxLines: 6, maxHeight: 17.5 });
     textBox(context, "Polar Customer Service", 8, 66, 122, { size: 2.5, bold: true });
@@ -125,12 +126,12 @@
     context.moveTo(118, 24);
     context.lineTo(118, 65);
     context.stroke();
-    textBox(context, "Tipe kaca film", 125, 24, 57, { size: 3.1, bold: true });
-    core.positions.forEach((position, index) => {
-      const labels = { front: "Kaca depan", side: "Kaca samping", rear: "Kaca belakang" };
-      const film = record.films[position];
-      textBox(context, labels[position], 125, 33 + index * 10, 57, { size: 2.4, color: muted });
-      textBox(context, `Polar ${film.series} / ${film.tint}% Tint`, 125, 37 + index * 10, 57, { size: 2.7, minSize: 2.3, bold: true });
+    const ppf = core.productType(record) === "ppf";
+    textBox(context, ppf ? "Paint Protection Film" : "Tipe kaca film", 125, 24, 57, { size: 3.1, bold: true });
+    core.productDetails(record).forEach(([label, value], index) => {
+      const y = 33 + index * (ppf ? 13 : 10);
+      textBox(context, label, 125, y, 57, { size: 2.4, color: muted });
+      textBox(context, value, 125, y + 4, 57, { size: 2.7, minSize: 2.3, maxLines: ppf ? 4 : 1, maxHeight: ppf ? 17 : 6, bold: true });
     });
     rule(context, 70, blue, 0.45);
     textBox(context, "Berlaku sampai", 8, 73, 50, { size: 2.6, color: muted });
@@ -176,7 +177,7 @@
     const pdf = await library.PDFDocument.create();
     pdf.setTitle(`Kartu Garansi Polar - ${record.code}`);
     pdf.setAuthor("Polar Profilms");
-    pdf.setSubject(options.sample ? "Contoh kartu, bukan garansi aktif" : "Kartu garansi pemasangan kaca film");
+    pdf.setSubject(options.sample ? "Contoh kartu, bukan garansi aktif" : core.productType(record) === "ppf" ? "Kartu garansi pemasangan PPF" : "Kartu garansi pemasangan kaca film");
     const mm = 72 / 25.4;
     for (const selected of side === "both" ? ["front", "back"] : [side]) {
       const canvas = renderCard(record, selected, { core, logo, qrFactory, canvasFactory, url, sample: options.sample });
