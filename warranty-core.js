@@ -4,7 +4,13 @@
   const series = ["Signature", "Drive", "Clear IR"];
   const ppfSeries = ["GLOSS\u00c9", "BLANC"];
   const shades = [10, 20, 40, 70, 80];
-  const positions = ["front", "side", "rear"];
+  const positions = ["windshield", "frontSides", "aroundWindows", "sunroof"];
+  const legacyPositions = ["front", "side", "rear"];
+  const positionLabels = {
+    windshield: "Windshield", frontSides: "Front Sides Window",
+    aroundWindows: "Around Windows", sunroof: "Sunroof",
+    front: "Kaca depan", side: "Kaca samping", rear: "Kaca belakang",
+  };
   const codePattern = /^PLR-\d{4}-[A-Z0-9]{8}$/;
 
   function normalizeCode(value) {
@@ -71,10 +77,18 @@
     return typeof value === "string" && value.trim().length > 0 && value.length <= length;
   }
 
+  function positionsForFilms(films) {
+    if (!films || typeof films !== "object" || Array.isArray(films)) return [];
+    const keys = Object.keys(films);
+    const layout = keys.some(key => positions.includes(key)) ? positions : legacyPositions;
+    return keys.length === layout.length && layout.every(key => Object.prototype.hasOwnProperty.call(films, key)) ? layout : [];
+  }
+
   function validFilms(films) {
-    return films && positions.every(position => {
+    const layout = positionsForFilms(films);
+    return layout.length > 0 && layout.some(position => films[position] !== null) && layout.every(position => {
       const film = films[position];
-      return film && series.includes(film.series) && shades.includes(film.tint);
+      return film === null || Boolean(film && series.includes(film.series) && shades.includes(film.tint));
     });
   }
 
@@ -94,8 +108,10 @@
       ["Seri PPF", `PPF POLAR ${record.ppf?.series || "-"}`],
       ["Area pemasangan", record.ppf?.coverage || "-"],
     ];
-    const labels = { front: "Kaca depan", side: "Kaca samping", rear: "Kaca belakang" };
-    return positions.map(position => [labels[position], `Polar ${record.films[position].series} / ${record.films[position].tint}% Tint`]);
+    return positionsForFilms(record.films).map(position => {
+      const film = record.films[position];
+      return [positionLabels[position], film === null ? "None" : `Polar ${film.series} / ${film.tint}% Tint`];
+    });
   }
 
   function isPublicRecord(record) {
@@ -144,7 +160,14 @@
     if (productType(previous) !== productType(record) ||
         !["vehicle", "vinSuffix", "year", "color", "dealer", "installedAt", "expiresAt", "years"].every(key => previous[key] === record[key])) return false;
     if (productType(record) === "ppf") return previous.ppf.series === record.ppf.series && previous.ppf.coverage === record.ppf.coverage;
-    return positions.every(position => previous.films[position].series === record.films[position].series && previous.films[position].tint === record.films[position].tint);
+    const layout = positionsForFilms(record.films);
+    if (!layout.length || layout.join() !== positionsForFilms(previous.films).join()) return false;
+    return layout.every(position => {
+      const before = previous.films[position];
+      const after = record.films[position];
+      return before === null || after === null ? before === after :
+        Boolean(before && after && before.series === after.series && before.tint === after.tint);
+    });
   }
 
   function exportRegistry(registry, drafts) {
@@ -159,5 +182,5 @@
     return `window.PolarWarrantyRegistry = ${JSON.stringify({ version: 1, records }, null, 2)};\n`;
   }
 
-  root.PolarWarranty = { series, ppfSeries, shades, positions, productType, productDetails, codePattern, normalizeCode, today, expiryDate, formatDate, createCode, cleanBaseUrl, verificationUrl, isDraft, publicRecord, sameRecord, registryRecords, lookup, exportRegistry };
+  root.PolarWarranty = { series, ppfSeries, shades, positions, positionLabels, positionsForFilms, productType, productDetails, codePattern, normalizeCode, today, expiryDate, formatDate, createCode, cleanBaseUrl, verificationUrl, isDraft, publicRecord, sameRecord, registryRecords, lookup, exportRegistry };
 })(typeof window !== "undefined" ? window : globalThis);

@@ -27,32 +27,41 @@
   catch (_) { registryAvailable = false; message.textContent = "Daftar garansi belum dimuat. Ekspor daftar belum tersedia."; }
 
   const filmFields = document.querySelector("[data-film-fields]");
-  const positionLabels = { front: "Kaca depan", side: "Kaca samping", rear: "Kaca belakang" };
-  core.positions.forEach(position => {
-    const row = document.createElement("div");
-    row.className = "form-columns";
-    const seriesGroup = document.createElement("div");
-    const seriesLabel = document.createElement("label");
-    seriesLabel.htmlFor = `film-${position}-series`;
-    seriesLabel.textContent = positionLabels[position];
-    const seriesSelect = document.createElement("select");
-    seriesSelect.name = `${position}Series`;
-    seriesSelect.id = seriesLabel.htmlFor;
-    core.series.forEach(series => seriesSelect.add(new Option(`Polar ${series}`, series)));
-    seriesGroup.append(seriesLabel, seriesSelect);
-    const tintGroup = document.createElement("div");
-    const tintLabel = document.createElement("label");
-    tintLabel.htmlFor = `film-${position}-tint`;
-    tintLabel.textContent = "Tint";
-    const tintSelect = document.createElement("select");
-    tintSelect.name = `${position}Tint`;
-    tintSelect.id = tintLabel.htmlFor;
-    tintSelect.setAttribute("aria-label", `Tint ${positionLabels[position].toLowerCase()}`);
-    core.shades.forEach(tint => tintSelect.add(new Option(`${tint}%`, String(tint))));
-    tintGroup.append(tintLabel, tintSelect);
-    row.append(seriesGroup, tintGroup);
-    filmFields.append(row);
-  });
+  let filmPositions = core.positions;
+  function buildFilmFields(positions = core.positions) {
+    filmPositions = positions;
+    filmFields.replaceChildren();
+    positions.forEach(position => {
+      const row = document.createElement("div");
+      row.className = "form-columns";
+      const seriesGroup = document.createElement("div");
+      const seriesLabel = document.createElement("label");
+      seriesLabel.htmlFor = `film-${position}-series`;
+      seriesLabel.textContent = core.positionLabels[position];
+      const seriesSelect = document.createElement("select");
+      seriesSelect.name = `${position}Series`;
+      seriesSelect.id = seriesLabel.htmlFor;
+      seriesSelect.add(new Option("None", ""));
+      core.series.forEach(series => seriesSelect.add(new Option(`Polar ${series}`, series)));
+      seriesGroup.append(seriesLabel, seriesSelect);
+      const tintGroup = document.createElement("div");
+      const tintLabel = document.createElement("label");
+      tintLabel.htmlFor = `film-${position}-tint`;
+      tintLabel.textContent = "Tint";
+      const tintSelect = document.createElement("select");
+      tintSelect.name = `${position}Tint`;
+      tintSelect.id = tintLabel.htmlFor;
+      tintSelect.setAttribute("aria-label", `Tint ${core.positionLabels[position]}`);
+      const noTint = new Option("None", "");
+      noTint.disabled = true;
+      tintSelect.add(noTint);
+      core.shades.forEach(tint => tintSelect.add(new Option(`${tint}%`, String(tint))));
+      tintGroup.append(tintLabel, tintSelect);
+      row.append(seriesGroup, tintGroup);
+      filmFields.append(row);
+    });
+  }
+  buildFilmFields();
   core.ppfSeries.forEach(series => form.elements.ppfSeries.add(new Option(`PPF POLAR ${series}`, series)));
 
   function syncProductFields() {
@@ -65,6 +74,13 @@
     windowFields.disabled = ppf;
     form.elements.years.disabled = ppf;
     if (ppf) form.elements.years.value = "5";
+    filmPositions.forEach(position => {
+      const tint = form.elements[`${position}Tint`];
+      const none = form.elements[`${position}Series`].value === "";
+      tint.disabled = ppf || none;
+      if (none) tint.value = "";
+      else if (!tint.value) tint.value = String(core.shades[0]);
+    });
   }
 
   form.elements.code.value = uniqueCode();
@@ -106,8 +122,9 @@
     if (record.productType === "ppf") record.ppf = { series: value("ppfSeries"), coverage: value("ppfCoverage") };
     else {
       record.films = {};
-      core.positions.forEach(position => {
-        record.films[position] = { series: value(`${position}Series`), tint: Number(value(`${position}Tint`)) };
+      filmPositions.forEach(position => {
+        const series = value(`${position}Series`);
+        record.films[position] = series ? { series, tint: Number(value(`${position}Tint`)) } : null;
       });
     }
     return record;
@@ -123,9 +140,12 @@
       form.elements.ppfCoverage.value = record.ppf.coverage;
     } else {
       windowFilmYears = String(record.years);
-      core.positions.forEach(position => {
-        form.elements[`${position}Series`].value = record.films[position].series;
-        form.elements[`${position}Tint`].value = String(record.films[position].tint);
+      const positions = core.positionsForFilms(record.films);
+      if (positions.join() !== filmPositions.join()) buildFilmFields(positions);
+      positions.forEach(position => {
+        const film = record.films[position];
+        form.elements[`${position}Series`].value = film?.series || "";
+        form.elements[`${position}Tint`].value = film ? String(film.tint) : "";
       });
     }
     render();
@@ -191,9 +211,10 @@
     const conflict = Boolean(published && (!validDraft || !core.sameRecord(published, core.publicRecord(record))));
     const cancelled = published?.state === "cancelled";
     const complete = validDraft && qrReady && !conflict && !cancelled;
+    const noFilms = record.productType === "window-film" && filmPositions.every(position => record.films[position] === null);
     printButton.disabled = !complete;
     pdfButton.disabled = !complete || pdfBusy;
-    previewStatus.textContent = conflict ? "Data berbeda dari daftar terbitan" : cancelled ? "Garansi dibatalkan" : complete ? "Siap dicetak" : "Data kartu belum lengkap";
+    previewStatus.textContent = conflict ? "Data berbeda dari daftar terbitan" : cancelled ? "Garansi dibatalkan" : noFilms ? "Pilih minimal satu area pemasangan" : complete ? "Siap dicetak" : "Data kartu belum lengkap";
     badge.textContent = conflict ? "Data perlu dikonfirmasi" : cancelled ? "Nomor dibatalkan" : published ? "Nomor sudah diterbitkan" : "Draf belum diterbitkan";
     badge.classList.toggle("is-published", Boolean(published && !conflict && !cancelled));
   }
@@ -225,6 +246,10 @@
     form.elements.baseUrl.setCustomValidity(baseUrl ? "" : "Masukkan alamat HTTPS website Polar yang sudah online.");
     if (!form.reportValidity()) return null;
     const record = readForm();
+    if (record.productType === "window-film" && filmPositions.every(position => record.films[position] === null)) {
+      message.textContent = "Pilih seri kaca film untuk minimal satu area pemasangan. Area lainnya dapat dipilih None.";
+      return null;
+    }
     if (!core.isDraft(record)) { message.textContent = "Periksa kembali data kendaraan dan tanggal pemasangan."; return null; }
     const published = publishedRecords.find(item => item.code === record.code);
     if (published && !core.sameRecord(published, core.publicRecord(record))) { message.textContent = "Data berbeda dari nomor yang sudah diterbitkan. Gunakan nomor baru atau hubungi Polar CS."; return null; }
@@ -276,6 +301,7 @@
   });
   document.querySelector("[data-new-code]").addEventListener("click", () => {
     form.elements.code.value = uniqueCode();
+    if (filmPositions.join() !== core.positions.join()) buildFilmFields();
     savedSelect.value = "";
     render();
     message.textContent = "Nomor garansi baru dibuat.";

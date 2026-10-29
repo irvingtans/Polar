@@ -128,10 +128,12 @@
     context.stroke();
     const ppf = core.productType(record) === "ppf";
     textBox(context, ppf ? "Paint Protection Film" : "Tipe kaca film", 125, 24, 57, { size: 3.1, bold: true });
-    core.productDetails(record).forEach(([label, value], index) => {
-      const y = 33 + index * (ppf ? 13 : 10);
+    const details = core.productDetails(record);
+    const compact = !ppf && details.length === 4;
+    details.forEach(([label, value], index) => {
+      const y = (compact ? 31 : 33) + index * (ppf ? 13 : compact ? 9 : 10);
       textBox(context, label, 125, y, 57, { size: 2.4, color: muted });
-      textBox(context, value, 125, y + 4, 57, { size: 2.7, minSize: 2.3, maxLines: ppf ? 4 : 1, maxHeight: ppf ? 17 : 6, bold: true });
+      textBox(context, value, 125, y + (compact ? 3.5 : 4), 57, { size: 2.7, minSize: 2.3, maxLines: ppf ? 4 : 1, maxHeight: ppf ? 17 : 6, bold: true });
     });
     rule(context, 70, blue, 0.45);
     textBox(context, "Berlaku sampai", 8, 73, 50, { size: 2.6, color: muted });

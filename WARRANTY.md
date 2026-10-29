@@ -15,7 +15,7 @@ Daftar awal sengaja kosong. Tidak ada garansi pelanggan atau contoh aktif yang d
 
 1. Buka `admin.html`, masukkan PIN Admin, lalu isi data pemasangan serta kendaraan.
 2. Masukkan alamat HTTPS website Polar yang sudah online. Untuk GitHub Pages, sertakan nama repository, misalnya `https://nama.github.io/polar/`. Tidak perlu menambahkan nama file HTML.
-3. Pilih jenis produk. Untuk kaca film, pilih seri dan tint untuk kaca depan, samping, dan belakang; garansi bawaan 5 tahun, dapat dipilih sampai 10 tahun sesuai dokumen pemasangan yang benar-benar diberikan. Untuk PPF, pilih PPF POLAR GLOSSÉ atau PPF POLAR BLANC dan isi area pemasangan; masa garansi PPF adalah 5 tahun sesuai konfirmasi pemilik.
+3. Pilih jenis produk. Untuk kaca film, isi seri dan tint pada area yang dipasang: Windshield, Front Sides Window, Around Windows, dan Sunroof. Pilih None untuk area yang tidak dipasang; tint area tersebut dinonaktifkan. Minimal satu area harus terpasang. Garansi bawaan 5 tahun, dapat dipilih sampai 10 tahun sesuai dokumen pemasangan yang benar-benar diberikan. Untuk PPF, pilih PPF POLAR GLOSSÉ atau PPF POLAR BLANC dan isi area pemasangan; masa garansi PPF adalah 5 tahun sesuai konfirmasi pemilik.
 4. Sesuaikan catatan garansi dengan ketentuan resmi Polar. Teks bawaan hanya merujuk ke dokumen garansi dan invoice, tidak membuat ketentuan pembatalan baru.
 5. Simpan Draf. Simpan juga Backup Draf untuk arsip internal.
 6. Pilih Ekspor Daftar Garansi. File ekspor menggabungkan daftar yang saat ini diterbitkan dengan semua draf tersimpan.
@@ -26,7 +26,7 @@ Jika nomor yang sudah diterbitkan memiliki data berbeda, ekspor dihentikan. Kore
 
 ## Cetak
 
-Kartu PPF mencantumkan seri dan area pemasangan, bukan tint atau VLT. Kartu kaca film tetap mencantumkan seri dan tint di setiap posisi kaca. Kedua jenis memakai alur QR, draf, PDF, dan penerbitan daftar yang sama. Untuk kendaraan yang memasang keduanya, buat satu kartu per jenis produk.
+Kartu PPF mencantumkan seri dan area pemasangan, bukan tint atau VLT. Kartu kaca film mencantumkan seri dan tint untuk area yang dipasang; area tanpa pemasangan tertulis None pada kartu, PDF, dan hasil cek online. Kedua jenis memakai alur QR, draf, PDF, dan penerbitan daftar yang sama. Untuk kendaraan yang memasang keduanya, buat satu kartu per jenis produk.
 
 Kartu berukuran 190 x 80 mm. Pilih depan saja, belakang saja, atau kedua sisi. Unduh PDF membuat file langsung di perangkat, tanpa dialog cetak dan tanpa mengirim data ke layanan lain. Setiap sisi ditempatkan pada satu halaman A4 dengan margin 10 mm dan gambar kartu 305 dpi. Cetak membuka dialog cetak browser. Gunakan A4, skala 100%, nonaktifkan header/footer browser. Untuk dua sisi pada printer duplex, gunakan flip on long edge. Dua halaman memakai posisi dan ukuran yang sama; potong mengikuti batas kartu.
 
@@ -41,6 +41,8 @@ GitHub Pages hanya melayani file statis. Pemeriksaan PIN dan sesi berjalan di br
 `productType` membedakan `window-film` dan `ppf`. Draf/daftar lama tanpa properti ini tetap dikenali sebagai kaca film. Data PPF menggunakan `ppf.series` (`GLOSSÉ` atau `BLANC`) dan `ppf.coverage` (maksimum 80 karakter); daftar publik PPF tidak memuat kolom kaca atau tint. Semua halaman pemakai core/checker harus diperbarui bersamaan saat format PPF ditambahkan. Ekspor tetap menggabungkan data kaca film dan PPF yang sudah ada tanpa menghapusnya.
 
 Draf disimpan di browser/perangkat, bukan database bersama. Backup JSON memuat nomor rangka lengkap untuk pencetakan dan harus menjadi arsip internal. Daftar publik hanya memuat enam karakter terakhir VIN, data kendaraan, dealer, pemasangan, film, dan masa berlaku. Nama pelanggan dan nomor telepon tidak diminta atau dipublikasikan.
+
+Kartu kaca film baru memakai empat key `films.windshield`, `films.frontSides`, `films.aroundWindows`, dan `films.sunroof`. Area yang tidak dipasang disimpan sebagai `null`, bukan film dengan tint 0. Draf dan daftar lama dengan tiga key `front`, `side`, `rear` tetap dapat dimuat, diperiksa, dan dicetak dengan label aslinya; tidak diubah otomatis menjadi cakupan pemasangan baru. Tombol nomor garansi baru memakai empat area baru. Terbitkan core, editor, PDF, dan ketiga halaman HTML bersamaan untuk memperbarui format ini.
 
 QR hanya memuat URL dengan nomor garansi. Halaman publik mencari nomor dalam daftar terbitan; halaman cetak tidak memiliki akses untuk mengubah data yang sudah online. Jika daftar gagal dimuat, checker menampilkan pesan layanan tidak tersedia, bukan hasil belum ditemukan.
 
