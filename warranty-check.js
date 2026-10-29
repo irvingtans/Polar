@@ -10,6 +10,103 @@
   const button = form.querySelector('button[type="submit"]');
   let requestId = 0;
   let controller;
+  let photoDialog;
+
+  function iconButton(icon, label) {
+    const element = document.createElement("button");
+    element.type = "button";
+    element.className = "w-photo-icon";
+    element.setAttribute("aria-label", label);
+    element.title = label;
+    const symbol = document.createElement("i");
+    symbol.dataset.lucide = icon;
+    symbol.setAttribute("aria-hidden", "true");
+    element.append(symbol);
+    return element;
+  }
+
+  function showPhoto(photos, index, vehicle, opener) {
+    photoDialog?.close();
+    const dialog = document.createElement("dialog");
+    photoDialog = dialog;
+    dialog.className = "w-photo-dialog";
+    dialog.setAttribute("aria-label", `Foto ${vehicle}`);
+    const close = iconButton("x", "Tutup foto");
+    const previous = iconButton("chevron-left", "Foto sebelumnya");
+    const next = iconButton("chevron-right", "Foto berikutnya");
+    const image = document.createElement("img");
+    image.referrerPolicy = "no-referrer";
+    const caption = document.createElement("p");
+    caption.className = "w-photo-caption";
+    caption.setAttribute("aria-live", "polite");
+    const toolbar = document.createElement("div");
+    toolbar.className = "w-photo-toolbar";
+    toolbar.append(previous, caption, next, close);
+    dialog.append(image, toolbar);
+    function renderPhoto() {
+      const photo = photos[index];
+      image.src = photo.url;
+      image.alt = photo.caption || `Foto ${vehicle} ${index + 1}`;
+      caption.textContent = `${index + 1} / ${photos.length}${photo.caption ? ` - ${photo.caption}` : ""}`;
+      previous.disabled = index === 0;
+      next.disabled = index === photos.length - 1;
+    }
+    previous.addEventListener("click", () => { if (index > 0) { index--; renderPhoto(); } });
+    next.addEventListener("click", () => { if (index < photos.length - 1) { index++; renderPhoto(); } });
+    close.addEventListener("click", () => dialog.close());
+    dialog.addEventListener("keydown", event => {
+      if (event.key === "ArrowLeft" && index > 0) { event.preventDefault(); index--; renderPhoto(); }
+      if (event.key === "ArrowRight" && index < photos.length - 1) { event.preventDefault(); index++; renderPhoto(); }
+    });
+    dialog.addEventListener("click", event => { if (event.target === dialog) dialog.close(); });
+    dialog.addEventListener("close", () => { dialog.remove(); if (photoDialog === dialog) photoDialog = null; opener.focus(); });
+    document.body.append(dialog);
+    renderPhoto();
+    window.lucide?.createIcons();
+    dialog.showModal();
+  }
+
+  function photoGallery(record) {
+    const photos = record.photos || [];
+    if (!photos.length) return null;
+    const section = document.createElement("section");
+    section.className = "w-photo-gallery";
+    section.setAttribute("aria-label", "Foto kendaraan");
+    const heading = document.createElement("h4");
+    heading.textContent = "Foto Kendaraan";
+    const grid = document.createElement("div");
+    grid.className = "w-photo-grid";
+    photos.forEach((photo, index) => {
+      const item = document.createElement("figure");
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "w-photo-thumb";
+      button.setAttribute("aria-label", `Lihat foto ${index + 1}${photo.caption ? `: ${photo.caption}` : ""}`);
+      const image = document.createElement("img");
+      image.src = photo.url;
+      image.alt = photo.caption || `Foto ${record.vehicle} ${index + 1}`;
+      image.width = 400; image.height = 300;
+      image.loading = "lazy";
+      image.referrerPolicy = "no-referrer";
+      image.addEventListener("error", () => {
+        image.hidden = true;
+        const error = document.createElement("span");
+        error.textContent = "Foto belum tersedia";
+        button.append(error); button.disabled = true;
+      }, { once: true });
+      button.append(image);
+      button.addEventListener("click", () => showPhoto(photos, index, record.vehicle, button));
+      item.append(button);
+      if (photo.caption) {
+        const caption = document.createElement("figcaption");
+        caption.textContent = photo.caption;
+        item.append(caption);
+      }
+      grid.append(item);
+    });
+    section.append(heading, grid);
+    return section;
+  }
 
   function field(label, value) {
     const row = document.createElement("div");
@@ -22,6 +119,7 @@
   }
 
   async function check() {
+    photoDialog?.close();
     controller?.abort();
     const id = ++requestId;
     result.hidden = true;
@@ -80,12 +178,15 @@
       ...core.productDetails(record),
     ].forEach(([label, value]) => list.append(field(label, value)));
     result.append(badge, title, number, list);
+    const gallery = photoGallery(record);
+    if (gallery) result.append(gallery);
     result.hidden = false;
     result.focus({ preventScroll: true });
   }
 
   form.addEventListener("submit", event => { event.preventDefault(); check(); });
   input.addEventListener("input", () => {
+    photoDialog?.close();
     requestId++;
     controller?.abort();
     if (button) { button.disabled = false; button.removeAttribute("aria-busy"); }

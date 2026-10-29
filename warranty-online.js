@@ -11,10 +11,16 @@
     const data = await response.json();
     const record = core.registryRecords({ version: 1, records: [data.record] })[0];
     if (record.code !== code) throw new Error("Konfirmasi nomor garansi tidak sesuai.");
-    return record;
+    const photos = Array.isArray(data.photos) ? data.photos.slice(0, 6).filter(photo => photo && /^[a-f0-9-]{36}$/.test(photo.id)
+      && typeof photo.caption === "string" && photo.caption.length <= 120 && !photo.hidden
+      && photo.url === `${origin}/api/warranties/${encodeURIComponent(code)}/photos/${photo.id}/image`) : [];
+    return { ...record, photos };
   }
   function activationUrl(draft) {
     return `${origin}/activate#${encodeURIComponent(JSON.stringify(core.publicRecord(draft)))}`;
   }
-  window.PolarWarrantyOnline = { lookup, activationUrl };
+  function photoManagerUrl(code) {
+    return core.codePattern.test(code) ? `${origin}/photos?code=${encodeURIComponent(code)}` : "";
+  }
+  window.PolarWarrantyOnline = { lookup, activationUrl, photoManagerUrl };
 })();

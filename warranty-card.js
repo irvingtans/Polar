@@ -8,6 +8,7 @@
   const printButton = document.querySelector("[data-print-card]");
   const pdfButton = document.querySelector("[data-download-pdf]");
   const activateButton = document.querySelector("[data-activate-online]");
+  const photosButton = document.querySelector("[data-manage-photos]");
   const onlineRecords = new Map();
   let onlineRequest = 0;
   let pdfBusy = false;
@@ -237,6 +238,7 @@
     printButton.disabled = !complete;
     pdfButton.disabled = !complete || pdfBusy;
     if (activateButton) activateButton.disabled = !complete || Boolean(published);
+    if (photosButton) photosButton.disabled = !complete || !published;
     previewStatus.textContent = conflict ? "Data berbeda dari daftar terbitan" : cancelled ? "Garansi dibatalkan" : noFilms ? "Pilih minimal satu area pemasangan" : complete ? "Siap dicetak" : "Data kartu belum lengkap";
     badge.textContent = conflict ? "Data perlu dikonfirmasi" : cancelled ? "Nomor dibatalkan" : published ? "Terdaftar online" : "Belum diaktifkan online";
     badge.classList.toggle("is-published", Boolean(published && !conflict && !cancelled));
@@ -344,6 +346,11 @@
     message.textContent = "Konfirmasi aktivasi di tab yang terbuka menggunakan akun pemilik Polar. Kartu belum aktif sebelum konfirmasi berhasil.";
   });
   window.addEventListener("focus", refreshOnlineStatus);
+  photosButton?.addEventListener("click", () => {
+    const record = validate();
+    if (!record || !publishedRecord(record.code) || !window.PolarWarrantyOnline) return;
+    window.open(window.PolarWarrantyOnline.photoManagerUrl(record.code), "_blank", "noopener,noreferrer");
+  });
   document.querySelector("[data-print-select]").addEventListener("change", event => {
     document.body.dataset.printSide = event.target.value;
   });

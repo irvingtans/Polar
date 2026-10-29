@@ -26,7 +26,17 @@ Draf dan backup JSON disimpan di perangkat dan memuat VIN lengkap untuk pencetak
 
 `assets/warranty-registry.js` dipertahankan untuk kompatibilitas daftar lama. Hasil database menjadi prioritas; daftar lama hanya dibaca bila server mengonfirmasi nomor belum ada. Kegagalan jaringan ditampilkan sebagai layanan tidak tersedia, bukan nomor tidak terdaftar. Ekspor daftar lama masih tersedia pada Arsip daftar lama, tetapi tidak diperlukan untuk aktivasi baru.
 
-## Format dan Cetak
+## Foto Mobil
+
+Admin dapat membuka **Foto Mobil** setelah nomor garansi aktif, atau langsung melalui halaman `/photos` pada layanan online dan memasukkan nomor kartu. Masuk dengan akun ChatGPT pemilik Polar; PIN antarmuka saja tidak memberi izin unggah. Pilih maksimal 6 foto yang ditampilkan, isi keterangan opsional, kemudian Unggah. Galeri tampil di hasil cek garansi yang sama, baik halaman utama maupun `warranty.html`. Pengunjung dapat membuka foto ukuran penuh.
+
+Sesuai pilihan pemilik, foto dapat dilihat siapa pun yang mempunyai nomor/QR garansi, tanpa PIN tambahan. Jangan unggah dokumen, wajah, alamat, atau data lain yang tidak ingin dibagikan. Tidak ada endpoint daftar foto lintas garansi bagi pengunjung. Nomor rangka lengkap tidak ikut unggahan.
+
+JPG, PNG, dan WebP hingga 20 MB diproses di browser menjadi JPEG maksimal 1920 piksel dan 2 MB. Server memeriksa JPEG, ukuran, serta dimensi, dan membuang metadata EXIF/XMP, IPTC, serta komentar. File disimpan di R2, terpisah dari data garansi D1; nama file asli tidak disimpan. Foto tidak dimasukkan ke PDF/kartu cetak atau backup draf lokal.
+
+Sembunyikan memindahkan foto ke arsip; tidak menghapus file permanen. Foto tersembunyi tidak muncul pada hasil publik dan URL gambarnya mengembalikan 404 bagi pengunjung. Admin dapat memulihkan bila galeri belum berisi 6 foto. Batas penyimpanan 24 foto termasuk arsip per kartu. Foto yang pernah dilihat/diunduh tidak bisa ditarik dari perangkat penerima. Unggahan memakai ID idempoten agar percobaan ulang tidak menggandakan foto, dan batas galeri diperiksa secara atomik di database.
+
+## Format Kartu
 
 Kode memakai PLR, tahun, dan delapan karakter acak. Garansi aktif sampai akhir tanggal kedaluwarsa waktu Jakarta. Tanggal 29 Februari diklem ke 28 Februari pada tahun non-kabisat. `films` memakai `null` untuk None; format lama front/side/rear tidak dimigrasikan secara diam-diam. `productType` membedakan window-film dan ppf; format lama tanpa properti ini adalah kaca film.
 
