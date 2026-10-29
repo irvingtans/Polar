@@ -1,57 +1,35 @@
 # Garansi Polar
 
-Fitur ini berjalan pada website statis, termasuk GitHub Pages dan file lokal.
+Website utama tetap di GitHub Pages dengan domain `https://polarfilms.co`. Pengecekan dan aktivasi memakai layanan server `https://polar-warranty-online.irvingtans.chatgpt.site` dan database Cloudflare D1. Draf browser bukan bukti aktivasi online.
 
-## Halaman
+## Aktivasi dan Cetak
 
-- `warranty.html`: cek garansi dengan nomor kartu, atau melalui QR.
-- `admin.html`: masuk area Admin menggunakan PIN.
-- `warranty-card.html`: pengisian data, penyimpanan draf, dan cetak kartu setelah masuk Admin.
-- `assets/warranty-registry.js`: daftar garansi yang sudah diterbitkan.
+1. Buka `admin.html`, masukkan PIN, lalu isi kartu atau pilih draf tersimpan.
+2. Pilih produk. Kaca film menyediakan Windshield, Front Sides Window, Around Windows, dan Sunroof; pilih None untuk area yang tidak dipasang. Minimal satu area harus terpasang. Draf lama tiga area tetap memakai label dan cakupan aslinya.
+3. PPF menyediakan POLAR GLOSSÉ dan POLAR BLANC dengan area pemasangan dan masa garansi 5 tahun. Garansi kaca film 5-10 tahun harus sesuai dokumen pemasangan yang benar-benar diberikan. Buat kartu terpisah untuk kaca film dan PPF.
+4. Simpan Draf, lalu tekan **Aktifkan Online**. Tab konfirmasi hanya menerima data publik dengan VIN enam karakter terakhir, tidak menerima VIN lengkap atau catatan internal.
+5. Masuk menggunakan akun ChatGPT pemilik Polar dan tekan **Konfirmasi & Aktifkan**. Server menolak akun lain meskipun mengetahui PIN antarmuka.
+6. Setelah konfirmasi berhasil, nomor dapat langsung dicek melalui `warranty.html` atau QR dari perangkat lain. Tidak perlu unggah daftar ke GitHub. Kembali ke tab kartu untuk memperbarui status Terdaftar online.
+7. Cetak atau Unduh PDF. Draf/kartu yang pernah dicetak sebelum layanan online diluncurkan harus diaktifkan satu kali melalui tombol yang sama; QR lama tetap bekerja jika menggunakan domain Polar yang benar.
 
-Daftar awal sengaja kosong. Tidak ada garansi pelanggan atau contoh aktif yang dibuat tanpa data asli. Nomor yang belum diterbitkan menampilkan hasil belum ditemukan, bukan konfirmasi barang palsu.
+Aktivasi tidak dilakukan otomatis saat menyimpan, mencetak, mengunduh PDF, atau mengimpor backup. Setiap kartu dikonfirmasi secara individual agar draf contoh tidak menjadi garansi resmi. Jangan aktifkan data contoh di produksi.
 
-## Menerbitkan kartu
+## Keamanan dan Penyimpanan
 
-1. Buka `admin.html`, masukkan PIN Admin, lalu isi data pemasangan serta kendaraan.
-2. Masukkan alamat HTTPS website Polar yang sudah online. Untuk GitHub Pages, sertakan nama repository, misalnya `https://nama.github.io/polar/`. Tidak perlu menambahkan nama file HTML.
-3. Pilih jenis produk. Untuk kaca film, isi seri dan tint pada area yang dipasang: Windshield, Front Sides Window, Around Windows, dan Sunroof. Pilih None untuk area yang tidak dipasang; tint area tersebut dinonaktifkan. Minimal satu area harus terpasang. Garansi bawaan 5 tahun, dapat dipilih sampai 10 tahun sesuai dokumen pemasangan yang benar-benar diberikan. Untuk PPF, pilih PPF POLAR GLOSSÉ atau PPF POLAR BLANC dan isi area pemasangan; masa garansi PPF adalah 5 tahun sesuai konfirmasi pemilik.
-4. Sesuaikan catatan garansi dengan ketentuan resmi Polar. Teks bawaan hanya merujuk ke dokumen garansi dan invoice, tidak membuat ketentuan pembatalan baru.
-5. Simpan Draf. Simpan juga Backup Draf untuk arsip internal.
-6. Pilih Ekspor Daftar Garansi. File ekspor menggabungkan daftar yang saat ini diterbitkan dengan semua draf tersimpan.
-7. Pemilik website mengganti `assets/warranty-registry.js` di GitHub dengan file ekspor. Gunakan versi daftar paling baru saat mengekspor agar penerbitan dari perangkat lain tidak tertimpa. Bump nilai `v=` pada referensi registry di ketiga HTML bila CDN masih menyimpan versi lama.
-8. Setelah deployment selesai, cek nomor pada `warranty.html` atau pindai QR untuk memastikan data terdaftar.
+`services/polar-warranty` adalah sumber layanan server. Identitas pemilik diverifikasi melalui Sign in with ChatGPT dan allowlist email di secret runtime `POLAR_ADMIN_EMAIL`. Jangan menaruh kredensial atau token GitHub dalam JavaScript publik. PIN browser hanya pembatas antarmuka lokal, bukan otorisasi penerbitan. Sesi PIN berlaku 30 menit. Keluar tidak menghapus draf lokal.
 
-Jika nomor yang sudah diterbitkan memiliki data berbeda, ekspor dihentikan. Koreksi data dan pembatalan hanya boleh dilakukan pemilik website pada daftar resmi. Untuk pembatalan, ubah `state` menjadi `cancelled`. Tombol cetak tidak menerbitkan atau mengaktifkan garansi.
+D1 menyimpan data publik per nomor kartu, waktu aktivasi, dan identitas penerbit untuk audit internal. Tidak ada endpoint daftar semua kartu untuk pengunjung. API publik hanya mengembalikan hasil satu nomor lengkap, tanpa identitas penerbit. Pengecekan dibatasi 120 permintaan per alamat jaringan per 10 menit; alamat disimpan sebagai hash berbatas waktu. Respons memakai no-store dan CORS untuk domain website Polar. Aktivasi memerlukan identitas pemilik, Origin yang sama, dan JSON yang tervalidasi.
 
-## Cetak
+Nomor yang sama dengan data identik aman untuk dicoba kembali. Data berbeda atau nomor berstatus cancelled tidak bisa ditimpa/diaktifkan ulang. Data resmi yang keliru perlu ditangani pemilik, bukan ditimpa dengan draf. Belum ada antarmuka pembatalan atau perubahan data pelanggan; jangan mengedit database tanpa arsip dan konfirmasi pemilik.
 
-Kartu PPF mencantumkan seri dan area pemasangan, bukan tint atau VLT. Kartu kaca film mencantumkan seri dan tint untuk area yang dipasang; area tanpa pemasangan tertulis None pada kartu, PDF, dan hasil cek online. Kedua jenis memakai alur QR, draf, PDF, dan penerbitan daftar yang sama. Untuk kendaraan yang memasang keduanya, buat satu kartu per jenis produk.
+Draf dan backup JSON disimpan di perangkat dan memuat VIN lengkap untuk pencetakan; simpan sebagai arsip internal. Nama pelanggan dan nomor telepon tidak diminta. Daftar publik hanya memuat VIN enam karakter terakhir, kendaraan, dealer, produk, area, dan tanggal garansi. Tidak ada draf lokal yang dipindah otomatis ke database.
 
-Kartu berukuran 190 x 80 mm. Pilih depan saja, belakang saja, atau kedua sisi. Unduh PDF membuat file langsung di perangkat, tanpa dialog cetak dan tanpa mengirim data ke layanan lain. Setiap sisi ditempatkan pada satu halaman A4 dengan margin 10 mm dan gambar kartu 305 dpi. Cetak membuka dialog cetak browser. Gunakan A4, skala 100%, nonaktifkan header/footer browser. Untuk dua sisi pada printer duplex, gunakan flip on long edge. Dua halaman memakai posisi dan ukuran yang sama; potong mengikuti batas kartu.
+`assets/warranty-registry.js` dipertahankan untuk kompatibilitas daftar lama. Hasil database menjadi prioritas; daftar lama hanya dibaca bila server mengonfirmasi nomor belum ada. Kegagalan jaringan ditampilkan sebagai layanan tidak tersedia, bukan nomor tidak terdaftar. Ekspor daftar lama masih tersedia pada Arsip daftar lama, tetapi tidak diperlukan untuk aktivasi baru.
 
-## Akses Admin
+## Format dan Cetak
 
-Area Admin memakai PIN yang ditentukan pemilik website. Sesi disimpan di `sessionStorage`, berlaku 30 menit, dan dapat diakhiri dengan tombol Keluar. Akses langsung ke halaman kartu tanpa sesi diarahkan ke halaman Admin. Nomor PIN tidak dimasukkan ke URL atau dicetak pada kartu. Menutup tab biasanya mengakhiri sesi; pengembalian tab oleh browser dapat memulihkan sesi sampai masa 30 menit berakhir.
+Kode memakai PLR, tahun, dan delapan karakter acak. Garansi aktif sampai akhir tanggal kedaluwarsa waktu Jakarta. Tanggal 29 Februari diklem ke 28 Februari pada tahun non-kabisat. `films` memakai `null` untuk None; format lama front/side/rear tidak dimigrasikan secara diam-diam. `productType` membedakan window-film dan ppf; format lama tanpa properti ini adalah kaca film.
 
-GitHub Pages hanya melayani file statis. Pemeriksaan PIN dan sesi berjalan di browser, sehingga dapat dibaca atau dilewati melalui kode publik. Ini pembatas antarmuka, bukan autentikasi aman, dan bukan perlindungan untuk data rahasia. Jangan mengandalkan PIN untuk mengendalikan penerbitan garansi resmi atau menyimpan data pelanggan secara terpusat. Penerbitan daftar tetap memerlukan akses pemilik ke repository. Untuk Admin aman, gunakan backend dengan verifikasi PIN/password di server, pembatasan percobaan, dan sesi server. Draf yang sudah tersimpan tetap ada di perangkat setelah Keluar; gunakan perangkat internal untuk data lengkap kendaraan.
+Kartu 190 x 80 mm. PDF dibuat lokal pada 305 dpi, satu sisi per halaman A4 dengan margin 10 mm. Pilih depan, belakang, atau keduanya. Cetak skala 100%, nonaktifkan header/footer; duplex menggunakan flip on long edge. QR hanya berisi URL dengan nomor kartu, bukan data kendaraan atau kredensial.
 
-## Penyimpanan
-
-`productType` membedakan `window-film` dan `ppf`. Draf/daftar lama tanpa properti ini tetap dikenali sebagai kaca film. Data PPF menggunakan `ppf.series` (`GLOSSÉ` atau `BLANC`) dan `ppf.coverage` (maksimum 80 karakter); daftar publik PPF tidak memuat kolom kaca atau tint. Semua halaman pemakai core/checker harus diperbarui bersamaan saat format PPF ditambahkan. Ekspor tetap menggabungkan data kaca film dan PPF yang sudah ada tanpa menghapusnya.
-
-Draf disimpan di browser/perangkat, bukan database bersama. Backup JSON memuat nomor rangka lengkap untuk pencetakan dan harus menjadi arsip internal. Daftar publik hanya memuat enam karakter terakhir VIN, data kendaraan, dealer, pemasangan, film, dan masa berlaku. Nama pelanggan dan nomor telepon tidak diminta atau dipublikasikan.
-
-Kartu kaca film baru memakai empat key `films.windshield`, `films.frontSides`, `films.aroundWindows`, dan `films.sunroof`. Area yang tidak dipasang disimpan sebagai `null`, bukan film dengan tint 0. Draf dan daftar lama dengan tiga key `front`, `side`, `rear` tetap dapat dimuat, diperiksa, dan dicetak dengan label aslinya; tidak diubah otomatis menjadi cakupan pemasangan baru. Tombol nomor garansi baru memakai empat area baru. Terbitkan core, editor, PDF, dan ketiga halaman HTML bersamaan untuk memperbarui format ini.
-
-QR hanya memuat URL dengan nomor garansi. Halaman publik mencari nomor dalam daftar terbitan; halaman cetak tidak memiliki akses untuk mengubah data yang sudah online. Jika daftar gagal dimuat, checker menampilkan pesan layanan tidak tersedia, bukan hasil belum ditemukan.
-
-Nomor memakai awalan PLR, tahun, dan delapan digit acak. Masa berlaku dihitung berdasarkan tanggal pemasangan; pemasangan 29 Februari jatuh tempo 28 Februari pada tahun non-kabisat. Status aktif berlaku sampai akhir tanggal kedaluwarsa menurut waktu Indonesia. Tidak ada biaya klaim atau ketentuan hukum baru yang diasumsikan dari kartu merek lain.
-
-Sistem ini belum menyediakan autentikasi server untuk dealer atau penyimpanan terpusat. Untuk pendaftaran otomatis dari banyak dealer, daftar statis perlu diganti API/database dengan autentikasi. Jangan memasukkan token GitHub atau kredensial ke halaman publik.
-
-## Library
-
-QR dibuat secara lokal dengan [qrcode-generator](https://github.com/kazuhikoarase/qrcode-generator) karya Kazuhiko Arase, berlisensi MIT. Sumber vendored mempertahankan notice lisensi. Ikon menggunakan [Lucide](https://lucide.dev), berlisensi ISC. Tidak ada layanan QR eksternal yang menerima data kartu.
-
-PDF dibuat lokal dengan [pdf-lib](https://pdf-lib.js.org), berlisensi MIT. Bundle dan notice lisensi tersedia pada folder `vendor`.
+QR memakai qrcode-generator (MIT), PDF memakai pdf-lib (MIT), ikon memakai Lucide (ISC). Notice lisensi disertakan dalam vendor. Tidak ada layanan QR/PDF eksternal yang menerima data kartu. Ketentuan garansi harus mengacu pada dokumen resmi Polar dan invoice pemasangan, bukan contoh kartu merek lain.

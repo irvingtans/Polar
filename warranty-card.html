@@ -48,10 +48,13 @@
               <label for="card-base-url">Alamat website Polar</label><input id="card-base-url" name="baseUrl" type="url" maxlength="240" placeholder="https://polarfilms.co/" aria-describedby="url-hint" required><p class="field-hint" id="url-hint">Alamat website yang sudah online, untuk tujuan QR pada kartu.</p>
               <label for="card-notes">Catatan garansi</label><textarea id="card-notes" name="notes" rows="4" maxlength="450">Simpan kartu garansi dan bukti pemasangan. Ikuti petunjuk perawatan dari dealer Polar. Ketentuan dan cakupan garansi mengacu pada dokumen garansi serta invoice pemasangan Anda.</textarea>
             </fieldset>
-            <button class="w-button w-primary save-button" type="submit"><i data-lucide="save" aria-hidden="true"></i> Simpan Draf</button>
+            <div class="draft-actions">
+            <button class="w-button w-secondary save-button" type="submit"><i data-lucide="save" aria-hidden="true"></i> Simpan Draf</button>
+            <button class="w-button w-primary save-button" type="button" data-activate-online disabled><i data-lucide="shield-check" aria-hidden="true"></i> Aktifkan Online</button>
+            </div>
           </form>
           <p class="editor-message" data-editor-message role="status" aria-live="polite"></p>
-          <section class="saved-drafts" aria-labelledby="saved-title"><h2 id="saved-title">Draf tersimpan</h2><select data-saved-drafts aria-label="Pilih draf tersimpan"><option value="">Belum ada draf</option></select><div class="draft-actions"><button class="w-button w-secondary" type="button" data-export-drafts disabled><i data-lucide="download" aria-hidden="true"></i> Backup Draf</button><label class="w-button w-secondary import-label"><i data-lucide="upload" aria-hidden="true"></i> Impor Draf<input type="file" data-import-drafts accept="application/json,.json" class="sr-only"></label></div><button class="w-button w-secondary export-button" type="button" data-export-registry disabled><i data-lucide="file-down" aria-hidden="true"></i> Ekspor Daftar Garansi</button><p class="field-hint">Draf tersimpan di perangkat ini. Garansi dapat dicek online setelah daftar diekspor dan diterbitkan di website oleh Polar.</p></section>
+          <section class="saved-drafts" aria-labelledby="saved-title"><h2 id="saved-title">Draf tersimpan</h2><select data-saved-drafts aria-label="Pilih draf tersimpan"><option value="">Belum ada draf</option></select><div class="draft-actions"><button class="w-button w-secondary" type="button" data-export-drafts disabled><i data-lucide="download" aria-hidden="true"></i> Backup Draf</button><label class="w-button w-secondary import-label"><i data-lucide="upload" aria-hidden="true"></i> Impor Draf<input type="file" data-import-drafts accept="application/json,.json" class="sr-only"></label></div><details><summary>Arsip daftar lama</summary><button class="w-button w-secondary export-button" type="button" data-export-registry disabled><i data-lucide="file-down" aria-hidden="true"></i> Ekspor Daftar Garansi</button></details><p class="field-hint">Draf adalah arsip lokal. Status Terdaftar online muncul setelah konfirmasi aktivasi oleh akun pemilik Polar.</p></section>
         </section>
         <section class="card-preview-area" aria-labelledby="preview-title">
           <div class="preview-toolbar"><h2 id="preview-title">Pratinjau kartu</h2><div class="print-actions"><select aria-label="Sisi yang dicetak" data-print-select><option value="both">Depan &amp; belakang</option><option value="front">Depan saja</option><option value="back">Belakang saja</option></select><button class="w-button w-secondary" type="button" data-print-card disabled><i data-lucide="printer" aria-hidden="true"></i> Cetak</button><button class="w-button w-primary" type="button" data-download-pdf disabled><i data-lucide="download" aria-hidden="true"></i> Unduh PDF</button></div></div>
@@ -80,6 +83,7 @@
     <script src="assets/warranty-registry.js?v=20261007-1"></script>
     <script src="warranty-core.js?v=20261029-areas1"></script>
     <script src="warranty-pdf.js?v=20261029-areas1"></script>
-    <script src="warranty-card.js?v=20261029-areas1"></script>
+    <script src="warranty-online.js?v=20261029-online1"></script>
+    <script src="warranty-card.js?v=20261029-online1"></script>
   </body>
 </html>

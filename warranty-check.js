@@ -7,6 +7,9 @@
   const message = document.querySelector("[data-warranty-message]");
   const result = document.querySelector("[data-warranty-result]");
   const headings = { active: "Garansi aktif", expired: "Masa garansi berakhir", cancelled: "Garansi dibatalkan" };
+  const button = form.querySelector('button[type="submit"]');
+  let requestId = 0;
+  let controller;
 
   function field(label, value) {
     const row = document.createElement("div");
@@ -18,7 +21,9 @@
     return row;
   }
 
-  function check() {
+  async function check() {
+    controller?.abort();
+    const id = ++requestId;
     result.hidden = true;
     result.replaceChildren();
     input.value = core.normalizeCode(input.value);
@@ -29,15 +34,27 @@
       return;
     }
     input.removeAttribute("aria-invalid");
+    const code = input.value;
+    const currentController = new AbortController();
+    controller = currentController;
+    const timeout = window.setTimeout(() => currentController.abort(), 12000);
+    message.textContent = "Mengecek garansi online...";
+    if (button) { button.disabled = true; button.setAttribute("aria-busy", "true"); }
     let response;
     try {
-      response = core.lookup(window.PolarWarrantyRegistry, input.value);
-    } catch (_) {
-      message.textContent = "Daftar garansi belum dapat dimuat. Silakan coba lagi atau hubungi Polar CS.";
+      if (!window.PolarWarrantyOnline) throw new Error("Layanan garansi belum dimuat. Muat ulang halaman.");
+      const online = await window.PolarWarrantyOnline.lookup(code, currentController.signal);
+      if (id !== requestId) return;
+      response = core.lookup(online ? { version: 1, records: [online] } : window.PolarWarrantyRegistry, code);
+    } catch (error) {
+      if (id === requestId) message.textContent = error.name === "AbortError" ? "Koneksi terlalu lama. Coba cek kembali atau hubungi Polar CS." : error.message || "Layanan garansi belum tersedia. Coba lagi.";
       return;
+    } finally {
+      window.clearTimeout(timeout);
+      if (id === requestId && button) { button.disabled = false; button.removeAttribute("aria-busy"); }
     }
     if (!response.record) {
-      message.textContent = "Nomor garansi belum ditemukan dalam daftar Polar. Periksa nomor kartu atau hubungi Polar CS untuk konfirmasi.";
+      message.textContent = "Nomor garansi belum diaktifkan atau belum terdaftar. Periksa nomor kartu atau hubungi Polar CS untuk aktivasi.";
       return;
     }
     message.textContent = "";
@@ -69,6 +86,9 @@
 
   form.addEventListener("submit", event => { event.preventDefault(); check(); });
   input.addEventListener("input", () => {
+    requestId++;
+    controller?.abort();
+    if (button) { button.disabled = false; button.removeAttribute("aria-busy"); }
     input.removeAttribute("aria-invalid");
     result.hidden = true;
     message.textContent = "";

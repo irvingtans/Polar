@@ -7,6 +7,9 @@
   const message = document.querySelector("[data-editor-message]");
   const printButton = document.querySelector("[data-print-card]");
   const pdfButton = document.querySelector("[data-download-pdf]");
+  const activateButton = document.querySelector("[data-activate-online]");
+  const onlineRecords = new Map();
+  let onlineRequest = 0;
   let pdfBusy = false;
   const savedSelect = document.querySelector("[data-saved-drafts]");
   const exportButton = document.querySelector("[data-export-registry]");
@@ -22,6 +25,25 @@
   let publishedRecords = [];
   let storageAvailable = true;
   let windowFilmYears = "5";
+
+  function publishedRecord(code) {
+    return onlineRecords.get(code) || publishedRecords.find(item => item.code === code);
+  }
+
+  async function refreshOnlineStatus() {
+    const code = core.normalizeCode(form.elements.code.value);
+    if (!core.codePattern.test(code) || !window.PolarWarrantyOnline) return;
+    const id = ++onlineRequest;
+    try {
+      const record = await window.PolarWarrantyOnline.lookup(code, AbortSignal.timeout(12000));
+      if (id !== onlineRequest) return;
+      if (record) onlineRecords.set(code, record);
+      else onlineRecords.delete(code);
+      if (core.normalizeCode(form.elements.code.value) === code) render();
+    } catch (_) {
+      if (id === onlineRequest) badge.textContent = "Status online belum dapat diperiksa";
+    }
+  }
 
   try { publishedRecords = core.registryRecords(window.PolarWarrantyRegistry); }
   catch (_) { registryAvailable = false; message.textContent = "Daftar garansi belum dimuat. Ekspor daftar belum tersedia."; }
@@ -206,7 +228,7 @@
     cardLink.textContent = url ? new URL(url).hostname : "Alamat website belum diisi";
     if (url) cardLink.href = url;
     else cardLink.removeAttribute("href");
-    const published = publishedRecords.find(item => item.code === record.code);
+    const published = publishedRecord(record.code);
     const validDraft = core.isDraft(record);
     const conflict = Boolean(published && (!validDraft || !core.sameRecord(published, core.publicRecord(record))));
     const cancelled = published?.state === "cancelled";
@@ -214,8 +236,9 @@
     const noFilms = record.productType === "window-film" && filmPositions.every(position => record.films[position] === null);
     printButton.disabled = !complete;
     pdfButton.disabled = !complete || pdfBusy;
+    if (activateButton) activateButton.disabled = !complete || Boolean(published);
     previewStatus.textContent = conflict ? "Data berbeda dari daftar terbitan" : cancelled ? "Garansi dibatalkan" : noFilms ? "Pilih minimal satu area pemasangan" : complete ? "Siap dicetak" : "Data kartu belum lengkap";
-    badge.textContent = conflict ? "Data perlu dikonfirmasi" : cancelled ? "Nomor dibatalkan" : published ? "Nomor sudah diterbitkan" : "Draf belum diterbitkan";
+    badge.textContent = conflict ? "Data perlu dikonfirmasi" : cancelled ? "Nomor dibatalkan" : published ? "Terdaftar online" : "Belum diaktifkan online";
     badge.classList.toggle("is-published", Boolean(published && !conflict && !cancelled));
   }
 
@@ -251,7 +274,7 @@
       return null;
     }
     if (!core.isDraft(record)) { message.textContent = "Periksa kembali data kendaraan dan tanggal pemasangan."; return null; }
-    const published = publishedRecords.find(item => item.code === record.code);
+    const published = publishedRecord(record.code);
     if (published && !core.sameRecord(published, core.publicRecord(record))) { message.textContent = "Data berbeda dari nomor yang sudah diterbitkan. Gunakan nomor baru atau hubungi Polar CS."; return null; }
     if (published?.state === "cancelled") { message.textContent = "Nomor ini sudah dibatalkan. Hubungi Polar CS."; return null; }
     render();
@@ -265,7 +288,7 @@
     else drafts[index] = record;
     const persisted = persist();
     updateDraftList(record.code);
-    message.textContent = persisted ? "Draf tersimpan di perangkat ini. Belum diterbitkan ke daftar garansi online." : "Draf tersimpan sementara. Unduh Backup Draf sebelum menutup halaman.";
+    message.textContent = persisted ? "Draf tersimpan di perangkat ini. Tekan Aktifkan Online agar nomor kartu dapat dicek pelanggan." : "Draf tersimpan sementara. Unduh Backup Draf sebelum menutup halaman.";
   }
 
   function download(name, content, type) {
@@ -293,6 +316,7 @@
       savedSelect.value = "";
     }
     render();
+    if (event.target.name === "code") refreshOnlineStatus();
   });
   form.addEventListener("submit", event => {
     event.preventDefault();
@@ -305,11 +329,21 @@
     savedSelect.value = "";
     render();
     message.textContent = "Nomor garansi baru dibuat.";
+    refreshOnlineStatus();
   });
   savedSelect.addEventListener("change", () => {
     const record = drafts.find(item => item.code === savedSelect.value);
-    if (record) { fillForm(record); message.textContent = "Draf dimuat."; }
+    if (record) { fillForm(record); message.textContent = "Draf dimuat."; refreshOnlineStatus(); }
   });
+  activateButton?.addEventListener("click", () => {
+    const record = validate();
+    if (!record || !window.PolarWarrantyOnline) return;
+    save(record);
+    const url = window.PolarWarrantyOnline.activationUrl(record);
+    window.open(url, "_blank", "noopener,noreferrer");
+    message.textContent = "Konfirmasi aktivasi di tab yang terbuka menggunakan akun pemilik Polar. Kartu belum aktif sebelum konfirmasi berhasil.";
+  });
+  window.addEventListener("focus", refreshOnlineStatus);
   document.querySelector("[data-print-select]").addEventListener("change", event => {
     document.body.dataset.printSide = event.target.value;
   });
@@ -330,7 +364,7 @@
       if (!window.PolarWarrantyPdf) throw new Error("Pembuat PDF belum dimuat. Muat ulang halaman dan coba lagi.");
       const bytes = await window.PolarWarrantyPdf.create(record, form.elements.baseUrl.value, document.body.dataset.printSide);
       download(`Polar-Warranty-${record.code}.pdf`, bytes, "application/pdf");
-      message.textContent = "Unduhan PDF dimulai. Penerbitan garansi online tetap melalui daftar resmi Polar.";
+      message.textContent = "Unduhan PDF dimulai. Pastikan kartu sudah diaktifkan melalui tombol Aktifkan Online.";
     } catch (error) {
       message.textContent = error.message || "PDF belum dapat dibuat. Coba lagi atau gunakan tombol Cetak.";
     } finally {
@@ -374,5 +408,6 @@
   });
   updateDraftList();
   render();
+  refreshOnlineStatus();
   window.lucide?.createIcons();
 })();
